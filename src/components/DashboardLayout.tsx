@@ -2,15 +2,14 @@
 import React from 'react';
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useUser } from '@/context/UserContext';
 import {
   WalletIcon,
   History,
-  LogOut,
-  User,
   Home,
   Receipt,
+  Bell,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -19,81 +18,78 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const navigate = useNavigate();
-  const userName = "John Doe"; // This will be replaced with actual user data
+  const location = useLocation();
+  const { user } = useUser();
+  
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Top Navigation */}
-      <nav className="border-b bg-card/80 backdrop-blur-sm fixed w-full z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+      <nav className="bg-white shadow-sm fixed w-full z-50 px-4 py-3">
+        <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold">HovaPay</h1>
+            <h1 className="text-xl font-bold text-primary">HovaPay</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
-              <Avatar>
-                <User className="h-5 w-5" />
-              </Avatar>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <Bell className="h-5 w-5" />
             </Button>
-            <span className="font-medium">{userName}</span>
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10 border-2 border-primary">
+                <img src={user?.avatar} alt={user?.name} />
+              </Avatar>
+              <div className="hidden md:block">
+                <p className="font-medium text-sm">{user?.name}</p>
+                <p className="text-xs text-muted-foreground">Good Morning!</p>
+              </div>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-16 pt-20 bg-card/80 backdrop-blur-sm border-r flex flex-col items-center space-y-6">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover-effect"
-          onClick={() => navigate('/dashboard')}
-        >
-          <Home className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover-effect"
-          onClick={() => navigate('/wallet')}
-        >
-          <WalletIcon className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover-effect"
-          onClick={() => navigate('/transactions')}
-        >
-          <History className="h-5 w-5" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover-effect"
-          onClick={() => navigate('/bills')}
-        >
-          <Receipt className="h-5 w-5" />
-        </Button>
-        <div className="flex-grow" />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="hover-effect text-destructive"
-          onClick={() => {
-            // Handle logout
-            navigate('/login');
-          }}
-        >
-          <LogOut className="h-5 w-5" />
-        </Button>
-      </div>
-
       {/* Main Content */}
-      <main className="pl-16 pt-16">
-        <div className="container mx-auto p-6">
+      <main className="pt-16 pb-20">
+        <div className="container mx-auto p-4">
           {children}
         </div>
       </main>
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center py-2 px-4 z-40">
+        <Button
+          variant="ghost"
+          className={`nav-item ${isActive('/dashboard') ? 'active' : ''}`}
+          onClick={() => navigate('/dashboard')}
+        >
+          <Home className="h-6 w-6" />
+          <span className="text-xs mt-1">Home</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`nav-item ${isActive('/wallet') ? 'active' : ''}`}
+          onClick={() => navigate('/wallet')}
+        >
+          <WalletIcon className="h-6 w-6" />
+          <span className="text-xs mt-1">Wallet</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`nav-item ${isActive('/bills') ? 'active' : ''}`}
+          onClick={() => navigate('/bills')}
+        >
+          <Receipt className="h-6 w-6" />
+          <span className="text-xs mt-1">Services</span>
+        </Button>
+        <Button
+          variant="ghost"
+          className={`nav-item ${isActive('/transactions') ? 'active' : ''}`}
+          onClick={() => navigate('/transactions')}
+        >
+          <History className="h-6 w-6" />
+          <span className="text-xs mt-1">History</span>
+        </Button>
+      </div>
     </div>
   );
 };

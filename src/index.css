@@ -11,7 +11,7 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 265 74% 60%;
     --primary-foreground: 0 0% 98%;
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -23,9 +23,9 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.75rem;
-    --hover: 240 5% 64.9%;
+    --ring: 265 74% 60%;
+    --radius: 1rem;
+    --hover: 265 74% 55%;
     --hover-foreground: 0 0% 98%;
   }
  
@@ -40,11 +40,23 @@
 }
 
 .glass-card {
-  @apply backdrop-blur-md bg-white/30 border border-white/20 shadow-xl;
+  @apply backdrop-blur-md bg-white/60 border border-white/40 shadow-xl rounded-2xl;
+}
+
+.purple-card {
+  @apply bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-2xl shadow-xl;
+}
+
+.light-purple-card {
+  @apply bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl shadow-md;
+}
+
+.pink-card {
+  @apply bg-gradient-to-r from-pink-200 to-pink-300 text-gray-800 rounded-2xl shadow-md;
 }
 
 .hover-effect {
-  @apply transition-all duration-300 ease-in-out hover:scale-105;
+  @apply transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg;
 }
 
 .service-icon {
@@ -57,4 +69,28 @@
 
 .slide-up {
   @apply animate-slideUp;
+}
+
+.numpad-btn {
+  @apply w-full h-16 rounded-xl bg-white hover:bg-gray-50 text-xl font-semibold flex items-center justify-center transition;
+}
+
+.payment-method-card {
+  @apply p-4 rounded-xl border border-gray-200 flex items-center space-x-3 cursor-pointer transition-all hover:border-primary hover:shadow-md;
+}
+
+.balance-display {
+  @apply text-3xl md:text-4xl font-bold;
+}
+
+.nav-item {
+  @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors hover:bg-purple-100;
+}
+
+.nav-item.active {
+  @apply text-primary;
+}
+
+.activity-item {
+  @apply flex items-center justify-between p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors rounded-lg;
 }

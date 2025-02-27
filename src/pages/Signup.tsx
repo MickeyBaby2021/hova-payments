@@ -20,11 +20,16 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-purple-700 to-purple-900 flex flex-col items-center justify-center p-4">
+      <div className="mb-10 text-center text-white">
+        <h1 className="text-3xl font-bold mb-2">Join HovaPay</h1>
+        <p>Start your smart banking journey today</p>
+      </div>
+      
       <Card className="w-full max-w-md p-6 glass-card fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-          <p className="text-muted-foreground">Join HovaPay today</p>
+          <h2 className="text-2xl font-bold mb-2">Create Account</h2>
+          <p className="text-muted-foreground">It only takes a minute</p>
         </div>
 
         <form onSubmit={handleSignup} className="space-y-6">
@@ -76,7 +81,7 @@ const Signup = () => {
             </div>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
             Create Account
           </Button>
         </form>
