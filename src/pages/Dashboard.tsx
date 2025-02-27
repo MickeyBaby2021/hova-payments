@@ -20,6 +20,7 @@ import {
   CreditCard,
   ArrowDown,
   ArrowUp,
+  Receipt,
 } from "lucide-react";
 
 const Dashboard = () => {
