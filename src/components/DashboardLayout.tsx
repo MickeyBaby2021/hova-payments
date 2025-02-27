@@ -14,6 +14,7 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
+import ChatButton from './ChatButton';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -42,7 +43,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
-            <div className="flex items-center space-x-3">
+            <div 
+              className="flex items-center space-x-3 cursor-pointer"
+              onClick={() => navigate('/profile')}
+            >
               <Avatar className="h-10 w-10 border-2 border-primary">
                 <img src={user?.avatar} alt={user?.name} />
               </Avatar>
@@ -97,6 +101,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <span className="text-xs mt-1">History</span>
         </Button>
       </div>
+
+      {/* Chat Button */}
+      <ChatButton />
     </div>
   );
 };

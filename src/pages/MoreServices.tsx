@@ -10,8 +10,8 @@ const MoreServices = () => {
   
   const services = [
     { icon: User, name: "Profile Settings", link: "/profile" },
-    { icon: Shield, name: "Security", link: "/security" },
-    { icon: CreditCard, name: "Cards & Banks", link: "/cards" },
+    { icon: Shield, name: "Security", link: "/profile?tab=security" },
+    { icon: CreditCard, name: "Cards & Banks", link: "/ewallet" },
     { icon: Settings, name: "Preferences", link: "/preferences" },
     { icon: HelpCircle, name: "Help & Support", link: "/support" },
     { icon: FileText, name: "Statements", link: "/statements" },

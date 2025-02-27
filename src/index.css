@@ -64,7 +64,7 @@
 }
 
 .glass-card {
-  @apply backdrop-blur-md bg-background/60 border border-border shadow-md rounded-2xl;
+  @apply backdrop-blur-md bg-white/80 dark:bg-black/30 border border-white/40 dark:border-white/10 shadow-md rounded-2xl;
 }
 
 .purple-card {
@@ -72,11 +72,11 @@
 }
 
 .light-purple-card {
-  @apply bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 text-card-foreground rounded-2xl shadow-md;
+  @apply bg-white dark:bg-gray-900 text-card-foreground rounded-2xl shadow-md border border-gray-100 dark:border-gray-800;
 }
 
 .pink-card {
-  @apply bg-gradient-to-r from-pink-200 to-pink-300 dark:from-pink-900 dark:to-pink-800 text-card-foreground rounded-2xl shadow-md;
+  @apply bg-white dark:bg-gray-900 text-card-foreground rounded-2xl shadow-md border border-gray-100 dark:border-gray-800;
 }
 
 .hover-effect {
@@ -96,11 +96,11 @@
 }
 
 .numpad-btn {
-  @apply w-full h-16 rounded-xl bg-background hover:bg-accent text-xl font-semibold flex items-center justify-center transition;
+  @apply w-full h-16 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-xl font-semibold flex items-center justify-center transition;
 }
 
 .payment-method-card {
-  @apply p-4 rounded-xl border border-border flex items-center space-x-3 cursor-pointer transition-all hover:border-primary hover:shadow-md;
+  @apply p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-3 cursor-pointer transition-all hover:border-primary hover:shadow-md;
 }
 
 .balance-display {
@@ -108,7 +108,7 @@
 }
 
 .nav-item {
-  @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors hover:bg-purple-100 dark:hover:bg-purple-900;
+  @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800;
 }
 
 .nav-item.active {
@@ -116,5 +116,52 @@
 }
 
 .activity-item {
-  @apply flex items-center justify-between p-4 border-b border-border hover:bg-accent/50 transition-colors rounded-lg;
+  @apply flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg;
+}
+
+/* Chat Widget Styles */
+.chat-widget {
+  @apply fixed bottom-20 right-4 z-50 w-72 md:w-80 shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800;
+}
+
+.chat-widget-header {
+  @apply bg-primary p-3 text-white font-medium flex items-center justify-between;
+}
+
+.chat-widget-content {
+  @apply h-80 overflow-y-auto p-4;
+}
+
+.chat-widget-input {
+  @apply p-3 border-t border-gray-200 dark:border-gray-800 flex;
+}
+
+.chat-bubble {
+  @apply max-w-[85%] p-3 rounded-xl mb-2;
+}
+
+.chat-bubble-user {
+  @apply bg-primary text-white ml-auto rounded-br-none;
+}
+
+.chat-bubble-agent {
+  @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 mr-auto rounded-bl-none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.5s ease-in-out;
 }

@@ -27,6 +27,7 @@ import FlightBooking from "./pages/services/FlightBooking";
 import HotelBooking from "./pages/services/HotelBooking";
 import Insurance from "./pages/services/Insurance";
 import Education from "./pages/services/Education";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/transfer" element={<Transfer />} />
               <Route path="/ewallet" element={<EWallet />} />
               <Route path="/more" element={<MoreServices />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/bills/airtime" element={<Airtime />} />
               <Route path="/bills/data" element={<Data />} />
               <Route path="/bills/electricity" element={<Electricity />} />
