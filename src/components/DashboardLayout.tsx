@@ -4,12 +4,15 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
+import { useTheme } from '@/context/ThemeContext';
 import {
   WalletIcon,
   History,
   Home,
   Receipt,
   Bell,
+  Moon,
+  Sun,
 } from 'lucide-react';
 
 interface DashboardLayoutProps {
@@ -20,18 +23,22 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
+  const { theme, toggleTheme } = useTheme();
   
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Top Navigation */}
-      <nav className="bg-white shadow-sm fixed w-full z-50 px-4 py-3">
+      <nav className="bg-card shadow-sm fixed w-full z-50 px-4 py-3">
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold text-primary">HovaPay</h1>
           </div>
           <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon" className="rounded-full" onClick={toggleTheme}>
+              {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Bell className="h-5 w-5" />
             </Button>
@@ -56,7 +63,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </main>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around items-center py-2 px-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-card border-t flex justify-around items-center py-2 px-4 z-40">
         <Button
           variant="ghost"
           className={`nav-item ${isActive('/dashboard') ? 'active' : ''}`}

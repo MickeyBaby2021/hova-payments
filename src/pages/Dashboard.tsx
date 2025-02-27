@@ -59,10 +59,10 @@ const Dashboard = () => {
   ];
 
   const quickServices = [
-    { icon: Send, name: "Transfer", color: "bg-primary" },
-    { icon: CreditCard, name: "E-wallet", color: "bg-primary" },
-    { icon: Receipt, name: "Bill", color: "bg-primary" },
-    { icon: PlusCircle, name: "More", color: "bg-primary" },
+    { icon: Send, name: "Transfer", color: "bg-primary", route: "/transfer" },
+    { icon: CreditCard, name: "E-wallet", color: "bg-primary", route: "/ewallet" },
+    { icon: Receipt, name: "Bill", color: "bg-primary", route: "/bills" },
+    { icon: PlusCircle, name: "More", color: "bg-primary", route: "/more" },
   ];
 
   return (
@@ -92,7 +92,11 @@ const Dashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-4 gap-2 mt-6">
           {quickServices.map((service) => (
-            <div key={service.name} className="text-center">
+            <div 
+              key={service.name} 
+              className="text-center cursor-pointer"
+              onClick={() => navigate(service.route)}
+            >
               <div className={`${service.color} h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-2`}>
                 <service.icon className="h-6 w-6 text-white" />
               </div>
