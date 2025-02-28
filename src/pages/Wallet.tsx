@@ -10,7 +10,8 @@ import {
   PlusCircle, 
   X, 
   ChevronLeft,
-  AlertCircle
+  AlertCircle,
+  Clock
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -22,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
   const navigate = useNavigate();
-  const { user, addToBalance } = useUser();
+  const { user, addToBalance, transactions } = useUser();
   const [amount, setAmount] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("flutterwave");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -73,9 +74,6 @@ const Wallet = () => {
         setShowNumpad(false);
         setShowDialog(false);
         
-        // Add transaction notification
-        toast.success(`₦${result.toLocaleString()} has been added to your wallet`);
-        
         // Navigate to dashboard after successful payment
         setTimeout(() => {
           navigate("/dashboard");
@@ -110,6 +108,11 @@ const Wallet = () => {
     setShowNumpad(true);
     setShowDialog(true);
   };
+
+  // Get only successful transactions for the wallet
+  const recentFunding = transactions
+    .filter(tx => tx.type === "credit" && tx.status === "success")
+    .slice(0, 3);
   
   return (
     <DashboardLayout>
@@ -279,18 +282,32 @@ const Wallet = () => {
               </Button>
             </div>
             <div className="space-y-4">
-              <div className="flex items-center justify-between py-2 border-b">
-                <div className="flex items-center">
-                  <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full mr-3">
-                    <WalletIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
+              {recentFunding.length > 0 ? (
+                recentFunding.map((transaction) => (
+                  <div key={transaction.id} className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center">
+                      <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full mr-3">
+                        <WalletIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{transaction.description}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(transaction.date).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                      +₦{transaction.amount.toLocaleString()}
+                    </span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">Wallet Funding</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Today, 2:30 PM</p>
-                  </div>
+                ))
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
+                  <Clock className="h-10 w-10 mb-2 opacity-50" />
+                  <p>No recent funding history</p>
+                  <p className="text-sm">Fund your wallet to see transactions here</p>
                 </div>
-                <span className="text-sm font-medium text-green-600 dark:text-green-400">+₦5,000</span>
-              </div>
+              )}
             </div>
           </Card>
         </div>

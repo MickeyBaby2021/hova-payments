@@ -9,18 +9,29 @@ interface User {
   avatar?: string;
 }
 
+interface Transaction {
+  id: string;
+  type: "credit" | "debit";
+  amount: number;
+  description: string;
+  date: Date;
+  status: "success" | "pending" | "failed";
+}
+
 interface UserContextType {
   user: User | null;
   setUser: (user: User) => void;
   isLoading: boolean;
   addToBalance: (amount: number) => void;
   deductFromBalance: (amount: number) => boolean;
+  transactions: Transaction[];
+  addTransaction: (transaction: Omit<Transaction, "id" | "date">) => void;
 }
 
 const defaultUser: User = {
   name: "Rupak Chakraborty",
   email: "rupak@example.com",
-  balance: 50000,
+  balance: 1000, // Starting with a small balance
   avatar: "https://i.pravatar.cc/150?img=8",
 };
 
@@ -29,6 +40,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(defaultUser);
   const [isLoading, setIsLoading] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const setUser = (newUser: User) => {
     setUserState(newUser);
@@ -41,7 +53,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       if (!prev) return prev;
       
       const newBalance = prev.balance + amount;
-      toast.success(`₦${amount.toLocaleString()} added to your wallet!`);
+      
+      // Add a transaction record
+      addTransaction({
+        type: "credit",
+        amount: amount,
+        description: "Wallet funding",
+        status: "success"
+      });
       
       return {
         ...prev,
@@ -64,8 +83,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
       
       const newBalance = prev.balance - amount;
-      toast.success(`₦${amount.toLocaleString()} deducted from your wallet`);
       success = true;
+      
+      // Add a transaction record
+      addTransaction({
+        type: "debit",
+        amount: amount,
+        description: "Bill payment",
+        status: "success"
+      });
       
       return {
         ...prev,
@@ -76,8 +102,32 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return success;
   };
 
+  const addTransaction = (transaction: Omit<Transaction, "id" | "date">) => {
+    const newTransaction: Transaction = {
+      ...transaction,
+      id: `tx-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      date: new Date()
+    };
+    
+    setTransactions(prev => [newTransaction, ...prev]);
+    
+    if (transaction.type === "credit") {
+      toast.success(`₦${transaction.amount.toLocaleString()} added to your wallet`);
+    } else {
+      toast.success(`₦${transaction.amount.toLocaleString()} deducted from your wallet`);
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, isLoading, addToBalance, deductFromBalance }}>
+    <UserContext.Provider value={{ 
+      user, 
+      setUser, 
+      isLoading, 
+      addToBalance, 
+      deductFromBalance,
+      transactions,
+      addTransaction
+    }}>
       {children}
     </UserContext.Provider>
   );

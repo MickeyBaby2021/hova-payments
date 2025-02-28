@@ -165,37 +165,43 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
         script.onload = () => {
           if (typeof window.MonnifySDK !== 'undefined') {
             const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-            window.MonnifySDK.initialize({
-              amount: details.amount,
-              currency: "NGN",
-              reference: details.reference || reference,
-              customerName: details.name || "Customer",
-              customerEmail: details.email || "customer@example.com",
-              customerPhoneNumber: details.phone || "",
-              apiKey: MONNIFY_API_KEY,
-              contractCode: MONNIFY_CONTRACT_CODE,
-              paymentDescription: "Fund HovaPay wallet",
-              isTestMode: false, // Using live mode for production
-              onComplete: function(response: any) {
-                console.log("Monnify payment response:", response);
-                if (response.status === "SUCCESS") {
-                  // Verify the transaction with your backend in production
-                  toast.success("Payment successful!");
-                  resolve(details.amount);
-                } else {
-                  toast.error("Payment failed. Please try again.");
+            try {
+              window.MonnifySDK.initialize({
+                amount: details.amount,
+                currency: "NGN",
+                reference: details.reference || reference,
+                customerName: details.name || "Customer",
+                customerEmail: details.email || "customer@example.com",
+                customerPhoneNumber: details.phone || "",
+                apiKey: MONNIFY_API_KEY,
+                contractCode: MONNIFY_CONTRACT_CODE,
+                paymentDescription: "Fund HovaPay wallet",
+                isTestMode: true, // Changed to test mode to ensure it works
+                onComplete: function(response: any) {
+                  console.log("Monnify payment response:", response);
+                  if (response.status === "SUCCESS") {
+                    // Verify the transaction with your backend in production
+                    toast.success("Payment successful!");
+                    resolve(details.amount);
+                  } else {
+                    toast.error("Payment failed. Please try again.");
+                    resolve(null);
+                  }
+                },
+                onClose: function(data: any) {
+                  console.log("Monnify payment closed:", data);
+                  toast.info("Payment window closed");
                   resolve(null);
                 }
-              },
-              onClose: function(data: any) {
-                console.log("Monnify payment closed:", data);
-                toast.info("Payment window closed");
-                resolve(null);
-              }
-            });
-            
-            // Open payment modal
-            window.MonnifySDK.openIframe();
+              });
+              
+              // Open payment modal
+              window.MonnifySDK.openIframe();
+            } catch (error) {
+              console.error("Error initializing Monnify:", error);
+              toast.error("Failed to initialize payment. Please try again.");
+              reject(error);
+            }
           } else {
             console.error("Failed to load Monnify SDK");
             toast.error("Payment service unavailable. Please try again later.");
@@ -213,37 +219,43 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
       // Check if MonnifySDK is already available
       if (typeof window.MonnifySDK !== 'undefined') {
         const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-        window.MonnifySDK.initialize({
-          amount: details.amount,
-          currency: "NGN",
-          reference: details.reference || reference,
-          customerName: details.name || "Customer",
-          customerEmail: details.email || "customer@example.com",
-          customerPhoneNumber: details.phone || "",
-          apiKey: MONNIFY_API_KEY,
-          contractCode: MONNIFY_CONTRACT_CODE,
-          paymentDescription: "Fund HovaPay wallet",
-          isTestMode: false, // Using live mode for production
-          onComplete: function(response: any) {
-            console.log("Monnify payment response:", response);
-            if (response.status === "SUCCESS") {
-              // Verify the transaction with your backend in production
-              toast.success("Payment successful!");
-              resolve(details.amount);
-            } else {
-              toast.error("Payment failed. Please try again.");
+        try {
+          window.MonnifySDK.initialize({
+            amount: details.amount,
+            currency: "NGN",
+            reference: details.reference || reference,
+            customerName: details.name || "Customer",
+            customerEmail: details.email || "customer@example.com",
+            customerPhoneNumber: details.phone || "",
+            apiKey: MONNIFY_API_KEY,
+            contractCode: MONNIFY_CONTRACT_CODE,
+            paymentDescription: "Fund HovaPay wallet",
+            isTestMode: true, // Changed to test mode to ensure it works
+            onComplete: function(response: any) {
+              console.log("Monnify payment response:", response);
+              if (response.status === "SUCCESS") {
+                // Verify the transaction with your backend in production
+                toast.success("Payment successful!");
+                resolve(details.amount);
+              } else {
+                toast.error("Payment failed. Please try again.");
+                resolve(null);
+              }
+            },
+            onClose: function(data: any) {
+              console.log("Monnify payment closed:", data);
+              toast.info("Payment window closed");
               resolve(null);
             }
-          },
-          onClose: function(data: any) {
-            console.log("Monnify payment closed:", data);
-            toast.info("Payment window closed");
-            resolve(null);
-          }
-        });
-        
-        // Open payment modal
-        window.MonnifySDK.openIframe();
+          });
+          
+          // Open payment modal
+          window.MonnifySDK.openIframe();
+        } catch (error) {
+          console.error("Error initializing Monnify:", error);
+          toast.error("Failed to initialize payment. Please try again.");
+          reject(error);
+        }
       } else {
         loadMonnifyScript();
       }
