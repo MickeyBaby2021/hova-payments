@@ -3,7 +3,7 @@ import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, CreditCard, Plus, Bank, Trash2, Edit, Loader2 } from "lucide-react";
+import { ArrowLeft, CreditCard, Plus, Building, Trash2, Edit, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -466,7 +466,7 @@ const CardsAndBanks = () => {
                   <div className="flex justify-between items-start">
                     <div className="flex items-center">
                       <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full mr-3">
-                        <Bank className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        <Building className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                       <div>
                         <p className="font-medium">{bank.bankName}</p>
@@ -485,7 +485,7 @@ const CardsAndBanks = () => {
                           onClick={() => handleSetDefaultBank(bank.id)}
                           title="Set as default"
                         >
-                          <Bank className="h-4 w-4" />
+                          <Building className="h-4 w-4" />
                         </Button>
                       )}
                       <Button 
@@ -504,7 +504,7 @@ const CardsAndBanks = () => {
             </div>
           ) : (
             <Card className="p-6 text-center">
-              <Bank className="h-10 w-10 mx-auto text-muted-foreground" />
+              <Building className="h-10 w-10 mx-auto text-muted-foreground" />
               <p className="mt-2 text-muted-foreground">No bank accounts added yet</p>
               <Button 
                 className="mt-4"
