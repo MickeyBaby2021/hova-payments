@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,23 +9,33 @@ import {
   Loader2, 
   PlusCircle, 
   X, 
-  ChevronLeft
+  ChevronLeft,
+  AlertCircle
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useUser } from "@/context/UserContext";
 import { initiateFlutterwavePayment, initiateMonnifyPayment } from "@/services/payment";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
+  const navigate = useNavigate();
   const { user, addToBalance } = useUser();
   const [amount, setAmount] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("flutterwave");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNumpad, setShowNumpad] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
+  // Clear error message when closing dialog
+  useEffect(() => {
+    if (!showDialog) {
+      setPaymentError(null);
+    }
+  }, [showDialog]);
 
   const handlePayment = async () => {
     const amountValue = parseFloat(amount);
@@ -36,6 +46,7 @@ const Wallet = () => {
     }
     
     setIsLoading(true);
+    setPaymentError(null);
     
     try {
       let result: number | null = null;
@@ -64,9 +75,15 @@ const Wallet = () => {
         
         // Add transaction notification
         toast.success(`₦${result.toLocaleString()} has been added to your wallet`);
+        
+        // Navigate to dashboard after successful payment
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
       }
     } catch (error) {
       console.error("Payment error:", error);
+      setPaymentError("An error occurred during payment. Please try again or choose a different payment method.");
       toast.error("An error occurred during payment");
     } finally {
       setIsLoading(false);
@@ -108,6 +125,13 @@ const Wallet = () => {
                 <DialogTitle>Fund Wallet</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
+                {paymentError && (
+                  <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-md flex items-start gap-2">
+                    <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-sm text-red-600 dark:text-red-400">{paymentError}</p>
+                  </div>
+                )}
+                
                 {showNumpad ? (
                   <div className="space-y-6">
                     <div className="relative">
@@ -131,16 +155,20 @@ const Wallet = () => {
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0, 'delete'].map((num) => (
                         <button
                           key={num}
-                          className="numpad-btn"
+                          className="bg-background hover:bg-muted text-foreground py-3 rounded-lg text-xl font-medium transition-colors"
                           onClick={() => handleNumpadClick(num.toString())}
                         >
                           {num === 'delete' ? (
-                            <X className="h-6 w-6" />
+                            <X className="h-6 w-6 mx-auto" />
                           ) : (
                             num
                           )}
                         </button>
                       ))}
+                    </div>
+                    
+                    <div className="text-sm text-muted-foreground text-center mb-2">
+                      Payment method: <span className="font-medium capitalize">{paymentMethod}</span>
                     </div>
                     
                     <Button 
@@ -166,10 +194,10 @@ const Wallet = () => {
                       onValueChange={setPaymentMethod}
                       className="space-y-3"
                     >
-                      <div className="payment-method-card">
+                      <div className="border rounded-lg p-3 flex items-center space-x-3">
                         <RadioGroupItem value="flutterwave" id="flutterwave" />
-                        <Label htmlFor="flutterwave" className="flex items-center space-x-3 cursor-pointer">
-                          <div className="bg-orange-100 p-2 rounded-full">
+                        <Label htmlFor="flutterwave" className="flex items-center space-x-3 cursor-pointer flex-1">
+                          <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-full">
                             <CreditCard className="h-5 w-5 text-orange-600" />
                           </div>
                           <div>
@@ -179,10 +207,10 @@ const Wallet = () => {
                         </Label>
                       </div>
                       
-                      <div className="payment-method-card">
+                      <div className="border rounded-lg p-3 flex items-center space-x-3">
                         <RadioGroupItem value="monnify" id="monnify" />
-                        <Label htmlFor="monnify" className="flex items-center space-x-3 cursor-pointer">
-                          <div className="bg-blue-100 p-2 rounded-full">
+                        <Label htmlFor="monnify" className="flex items-center space-x-3 cursor-pointer flex-1">
+                          <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-full">
                             <WalletIcon className="h-5 w-5 text-blue-600" />
                           </div>
                           <div>
@@ -245,7 +273,7 @@ const Wallet = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = "/transactions"}
+                onClick={() => navigate("/transactions")}
               >
                 View All
               </Button>
