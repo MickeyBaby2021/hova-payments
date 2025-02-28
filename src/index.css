@@ -72,11 +72,11 @@
 }
 
 .light-purple-card {
-  @apply bg-gradient-to-r from-purple-100 via-purple-200 to-pink-100 dark:from-purple-900 dark:via-purple-800 dark:to-pink-900 text-gray-800 dark:text-white rounded-2xl shadow-md;
+  @apply bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 dark:from-purple-700 dark:via-indigo-700 dark:to-blue-700 text-white rounded-2xl shadow-md;
 }
 
 .pink-card {
-  @apply bg-gradient-to-r from-purple-200 via-pink-200 to-pink-300 dark:from-purple-900 dark:via-pink-900 dark:to-pink-800 text-gray-800 dark:text-white rounded-2xl shadow-md;
+  @apply bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 dark:from-purple-700 dark:via-indigo-700 dark:to-blue-700 text-white rounded-2xl shadow-md;
 }
 
 .hover-effect {
