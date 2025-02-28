@@ -1,28 +1,35 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Phone, Loader2, Wifi } from "lucide-react";
+import { ArrowLeft, Phone, Loader2, Wifi, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { toast } from "sonner";
-import { payBill } from "@/services/payment";
+import { payBill, fetchServiceVariations } from "@/services/payment";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface DataPlan {
+  variation_code: string;
+  name: string;
+  amount: number;
+  validity: string;
+}
 
 const networkProviders = [
   { id: "mtn", name: "MTN", color: "bg-yellow-500", serviceID: "mtn-data" },
   { id: "airtel", name: "Airtel", color: "bg-red-500", serviceID: "airtel-data" },
   { id: "glo", name: "Glo", color: "bg-green-500", serviceID: "glo-data" },
-  { id: "9mobile", name: "9mobile", color: "bg-green-400", serviceID: "etisalat-data" },
-];
-
-const dataPlans = [
-  { id: "1", name: "1GB - 1 Day", amount: 300, code: "1d-1gb" },
-  { id: "2", name: "2GB - 7 Days", amount: 500, code: "7d-2gb" },
-  { id: "3", name: "5GB - 30 Days", amount: 1500, code: "30d-5gb" },
-  { id: "4", name: "10GB - 30 Days", amount: 2500, code: "30d-10gb" },
+  { id: "9mobile", name: "9Mobile", color: "bg-green-400", serviceID: "9mobile-data" },
 ];
 
 const Data = () => {
@@ -32,6 +39,38 @@ const Data = () => {
   const [selectedPlan, setSelectedPlan] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
+  const [dataPlans, setDataPlans] = useState<DataPlan[]>([]);
+
+  useEffect(() => {
+    if (selectedNetwork) {
+      const network = networkProviders.find(n => n.id === selectedNetwork);
+      if (network) {
+        loadDataPlans(network.serviceID);
+      }
+    }
+  }, [selectedNetwork]);
+
+  const loadDataPlans = async (serviceID: string) => {
+    setIsLoadingPlans(true);
+    setSelectedPlan("");
+    
+    try {
+      const plans = await fetchServiceVariations(serviceID);
+      if (plans && plans.length > 0) {
+        setDataPlans(plans as DataPlan[]);
+      } else {
+        toast.error("Could not load data plans");
+        setDataPlans([]);
+      }
+    } catch (error) {
+      console.error("Error loading data plans:", error);
+      toast.error("Failed to load data plans");
+      setDataPlans([]);
+    } finally {
+      setIsLoadingPlans(false);
+    }
+  };
 
   const handleBuyData = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +90,7 @@ const Data = () => {
       return;
     }
     
-    const plan = dataPlans.find(p => p.id === selectedPlan);
+    const plan = dataPlans.find(p => p.variation_code === selectedPlan);
     
     if (!plan) {
       toast.error("Invalid plan selected");
@@ -80,7 +119,7 @@ const Data = () => {
       
       const success = await payBill({
         serviceID: network.serviceID,
-        variation_code: plan.code,
+        variation_code: plan.variation_code,
         amount: plan.amount,
         phone: phoneNumber,
       });
@@ -159,27 +198,62 @@ const Data = () => {
             
             <div className="space-y-2">
               <Label>Select Data Plan</Label>
-              <div className="grid gap-3">
-                {dataPlans.map((plan) => (
-                  <div
-                    key={plan.id}
-                    className={`p-4 rounded-lg cursor-pointer border-2 transition-all ${
-                      selectedPlan === plan.id
-                        ? "border-primary"
-                        : "border-border"
-                    }`}
-                    onClick={() => setSelectedPlan(plan.id)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Wifi className="h-5 w-5 text-primary" />
-                        <span className="font-medium">{plan.name}</span>
-                      </div>
-                      <span className="font-semibold">₦{plan.amount}</span>
-                    </div>
+              {isLoadingPlans ? (
+                <div className="flex justify-center py-6">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : dataPlans.length === 0 ? (
+                <div className="p-6 text-center">
+                  <AlertCircle className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+                  <p className="text-muted-foreground">
+                    {selectedNetwork 
+                      ? "No data plans available for this provider" 
+                      : "Select a network provider to view data plans"}
+                  </p>
+                </div>
+              ) : (
+                <Select 
+                  value={selectedPlan} 
+                  onValueChange={setSelectedPlan}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a data plan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dataPlans.map((plan) => (
+                      <SelectItem key={plan.variation_code} value={plan.variation_code}>
+                        <div className="flex justify-between items-center w-full">
+                          <span>{plan.name}</span>
+                          <span className="font-semibold">₦{plan.amount}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              {selectedPlan && (
+                <div className="bg-muted p-3 rounded-md mt-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm">Selected Plan:</span>
+                    <span className="text-sm font-medium">
+                      {dataPlans.find(p => p.variation_code === selectedPlan)?.name}
+                    </span>
                   </div>
-                ))}
-              </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-sm">Validity:</span>
+                    <span className="text-sm font-medium">
+                      {dataPlans.find(p => p.variation_code === selectedPlan)?.validity}
+                    </span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span className="text-sm">Amount:</span>
+                    <span className="text-sm font-medium">
+                      ₦{dataPlans.find(p => p.variation_code === selectedPlan)?.amount}
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
             
             <Button 

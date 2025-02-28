@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Mail } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,9 +20,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-700 to-purple-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A1F2C] to-[#221F26] flex flex-col items-center justify-center p-4">
       <div className="mb-10 text-center text-white">
-        <h1 className="text-3xl font-bold mb-2">Welcome to HovaPay</h1>
+        <h1 className="text-4xl font-bold mb-2">HOVAPAY</h1>
         <p>The Magic of Smart Banking</p>
       </div>
       
@@ -54,13 +55,24 @@ const Login = () => {
               <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="pl-10"
+                className="pl-10 pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                className="absolute right-3 top-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-muted-foreground" />
+                ) : (
+                  <Eye className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
             </div>
           </div>
 

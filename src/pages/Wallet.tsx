@@ -25,6 +25,7 @@ const Wallet = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("flutterwave");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNumpad, setShowNumpad] = useState<boolean>(false);
+  const [showDialog, setShowDialog] = useState<boolean>(false);
 
   const handlePayment = async () => {
     const amountValue = parseFloat(amount);
@@ -44,12 +45,14 @@ const Wallet = () => {
           email: user?.email || "user@example.com",
           amount: amountValue,
           name: user?.name || "User",
+          phone: "08012345678", // In a real app, use the user's phone
         });
       } else if (paymentMethod === "monnify") {
         result = await initiateMonnifyPayment({
           email: user?.email || "user@example.com",
           amount: amountValue,
           name: user?.name || "User",
+          phone: "08012345678", // In a real app, use the user's phone
         });
       }
       
@@ -57,6 +60,10 @@ const Wallet = () => {
         addToBalance(result);
         setAmount("");
         setShowNumpad(false);
+        setShowDialog(false);
+        
+        // Add transaction notification
+        toast.success(`₦${result.toLocaleString()} has been added to your wallet`);
       }
     } catch (error) {
       console.error("Payment error:", error);
@@ -79,13 +86,20 @@ const Wallet = () => {
       setAmount(prev => prev + value);
     }
   };
+
+  const handleQuickFund = (amt: number) => {
+    setAmount(amt.toString());
+    setPaymentMethod("flutterwave");
+    setShowNumpad(true);
+    setShowDialog(true);
+  };
   
   return (
     <DashboardLayout>
       <div className="space-y-6 fade-in max-w-md mx-auto">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Wallet</h1>
-          <Dialog>
+          <Dialog open={showDialog} onOpenChange={setShowDialog}>
             <DialogTrigger asChild>
               <Button>Fund Wallet</Button>
             </DialogTrigger>
@@ -196,7 +210,7 @@ const Wallet = () => {
           <div className="flex items-center space-x-4 mb-4">
             <WalletIcon className="h-8 w-8" />
             <div>
-              <p className="text-sm text-gray-600">Wallet Balance</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Wallet Balance</p>
               <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
             </div>
           </div>
@@ -214,11 +228,7 @@ const Wallet = () => {
                 <Button 
                   key={amt} 
                   variant="outline" 
-                  onClick={() => {
-                    setAmount(amt.toString());
-                    setPaymentMethod("flutterwave");
-                    setShowNumpad(true);
-                  }}
+                  onClick={() => handleQuickFund(amt)}
                   className="border-dashed"
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
@@ -243,15 +253,15 @@ const Wallet = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between py-2 border-b">
                 <div className="flex items-center">
-                  <div className="bg-green-100 p-2 rounded-full mr-3">
-                    <WalletIcon className="h-4 w-4 text-green-600" />
+                  <div className="bg-green-100 dark:bg-green-900 p-2 rounded-full mr-3">
+                    <WalletIcon className="h-4 w-4 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
                     <p className="text-sm font-medium">Wallet Funding</p>
-                    <p className="text-xs text-gray-500">Today, 2:30 PM</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Today, 2:30 PM</p>
                   </div>
                 </div>
-                <span className="text-sm font-medium text-green-600">+₦5,000</span>
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">+₦5,000</span>
               </div>
             </div>
           </Card>

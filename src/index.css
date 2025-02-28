@@ -72,11 +72,11 @@
 }
 
 .light-purple-card {
-  @apply bg-white dark:bg-gray-900 text-card-foreground rounded-2xl shadow-md border border-gray-100 dark:border-gray-800;
+  @apply bg-gradient-to-r from-purple-100 via-purple-200 to-pink-100 dark:from-purple-900 dark:via-purple-800 dark:to-pink-900 text-gray-800 dark:text-white rounded-2xl shadow-md;
 }
 
 .pink-card {
-  @apply bg-white dark:bg-gray-900 text-card-foreground rounded-2xl shadow-md border border-gray-100 dark:border-gray-800;
+  @apply bg-gradient-to-r from-purple-200 via-pink-200 to-pink-300 dark:from-purple-900 dark:via-pink-900 dark:to-pink-800 text-gray-800 dark:text-white rounded-2xl shadow-md;
 }
 
 .hover-effect {
@@ -117,6 +117,23 @@
 
 .activity-item {
   @apply flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg;
+}
+
+/* Notification Styles */
+.notification-dot {
+  @apply absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full;
+}
+
+.notification-badge {
+  @apply absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full;
+}
+
+.notification-item {
+  @apply p-3 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors;
+}
+
+.notification-item-unread {
+  @apply bg-blue-50 dark:bg-blue-900/20;
 }
 
 /* Chat Widget Styles */
