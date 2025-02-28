@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useNotifications } from '@/context/NotificationContext';
 import {
   WalletIcon,
   History,
@@ -23,15 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  time: string;
-  read: boolean;
-  type: 'transaction' | 'system' | 'alert';
-}
-
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
@@ -41,49 +33,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const location = useLocation();
   const { user } = useUser();
   const { theme, toggleTheme } = useTheme();
-  
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: 1,
-      title: 'Wallet Funded',
-      message: 'Your wallet has been funded with ₦5,000',
-      time: '2 mins ago',
-      read: false,
-      type: 'transaction'
-    },
-    {
-      id: 2,
-      title: 'Airtime Purchase',
-      message: 'Airtime purchase of ₦1,000 was successful',
-      time: '1 hour ago',
-      read: false,
-      type: 'transaction'
-    },
-    {
-      id: 3,
-      title: 'Welcome to HovaPay',
-      message: 'Thank you for joining HovaPay',
-      time: '1 day ago',
-      read: true,
-      type: 'system'
-    }
-  ]);
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
-  };
-  
-  const markAsRead = (id: number) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
-  };
+  const { 
+    notifications, 
+    markAsRead, 
+    markAllAsRead, 
+    unreadCount 
+  } = useNotifications();
   
   const isActive = (path: string) => location.pathname === path;
 

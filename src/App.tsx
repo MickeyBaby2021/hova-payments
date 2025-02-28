@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "./context/UserContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { NotificationProvider } from "./context/NotificationContext";
 
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -28,6 +29,14 @@ import HotelBooking from "./pages/services/HotelBooking";
 import Insurance from "./pages/services/Insurance";
 import Education from "./pages/services/Education";
 import Profile from "./pages/Profile";
+import Security from "./pages/profile/Security";
+import Preferences from "./pages/profile/Preferences";
+import CardsAndBanks from "./pages/profile/CardsAndBanks";
+import Support from "./pages/profile/Support";
+import Statements from "./pages/profile/Statements";
+import Rewards from "./pages/profile/Rewards";
+import Referrals from "./pages/profile/Referrals";
+import Favorites from "./pages/profile/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -35,36 +44,46 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <UserProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner position="top-right" />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Navigate to="/login" replace />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/transactions" element={<Transactions />} />
-              <Route path="/wallet" element={<Wallet />} />
-              <Route path="/bills" element={<Bills />} />
-              <Route path="/transfer" element={<Transfer />} />
-              <Route path="/ewallet" element={<EWallet />} />
-              <Route path="/more" element={<MoreServices />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/bills/airtime" element={<Airtime />} />
-              <Route path="/bills/data" element={<Data />} />
-              <Route path="/bills/electricity" element={<Electricity />} />
-              <Route path="/bills/cable" element={<CableTV />} />
-              <Route path="/bills/gift-cards" element={<GiftCards />} />
-              <Route path="/bills/movies" element={<MovieTickets />} />
-              <Route path="/bills/flights" element={<FlightBooking />} />
-              <Route path="/bills/hotels" element={<HotelBooking />} />
-              <Route path="/bills/insurance" element={<Insurance />} />
-              <Route path="/bills/education" element={<Education />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <NotificationProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner position="top-right" />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/transactions" element={<Transactions />} />
+                <Route path="/wallet" element={<Wallet />} />
+                <Route path="/bills" element={<Bills />} />
+                <Route path="/transfer" element={<Transfer />} />
+                <Route path="/ewallet" element={<EWallet />} />
+                <Route path="/more" element={<MoreServices />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/security" element={<Security />} />
+                <Route path="/preferences" element={<Preferences />} />
+                <Route path="/ewallet" element={<CardsAndBanks />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/statements" element={<Statements />} />
+                <Route path="/rewards" element={<Rewards />} />
+                <Route path="/referrals" element={<Referrals />} />
+                <Route path="/favorites" element={<Favorites />} />
+                <Route path="/bills/airtime" element={<Airtime />} />
+                <Route path="/bills/data" element={<Data />} />
+                <Route path="/bills/electricity" element={<Electricity />} />
+                <Route path="/bills/cable" element={<CableTV />} />
+                <Route path="/bills/gift-cards" element={<GiftCards />} />
+                <Route path="/bills/movies" element={<MovieTickets />} />
+                <Route path="/bills/flights" element={<FlightBooking />} />
+                <Route path="/bills/hotels" element={<HotelBooking />} />
+                <Route path="/bills/insurance" element={<Insurance />} />
+                <Route path="/bills/education" element={<Education />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </NotificationProvider>
       </UserProvider>
     </ThemeProvider>
   </QueryClientProvider>
