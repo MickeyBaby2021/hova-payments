@@ -26,28 +26,24 @@ const StartupScreens = () => {
       description: "Your one-stop solution for all bill payments and financial services.",
       icon: <ShieldCheck className="h-16 w-16 text-primary" />,
       color: "bg-primary/10",
-      animation: "animate-fadeIn"
     },
     {
       title: "Pay bills effortlessly",
       description: "Fast and secure payments for airtime, data, electricity, TV subscriptions and more.",
       icon: <Zap className="h-16 w-16 text-primary" />,
       color: "bg-primary/10",
-      animation: "animate-slideInRight"
     },
     {
       title: "Secure wallet system",
       description: "Fund your wallet once and make multiple payments without stress.",
       icon: <WalletIcon className="h-16 w-16 text-indigo-600" />,
       color: "bg-indigo-100 dark:bg-indigo-950/30",
-      animation: "animate-slideInUp"
     },
     {
       title: "Multiple payment options",
       description: "Pay with cards, bank transfers, or mobile money. It's your choice.",
       icon: <CreditCard className="h-16 w-16 text-green-600" />,
       color: "bg-green-100 dark:bg-green-950/30",
-      animation: "animate-pulse"
     }
   ];
 
@@ -80,14 +76,14 @@ const StartupScreens = () => {
       </div>
       
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        <Card className={`p-8 w-full max-w-md mx-auto glass-card ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 ${screens[currentScreen].animation}`}>
-          <div className="flex justify-center mb-6 transition-all duration-300 animate-bounce">
+        <Card className={`p-8 w-full max-w-md mx-auto glass-card ${screens[currentScreen].color} border-none shadow-lg`}>
+          <div className="flex justify-center mb-6">
             {screens[currentScreen].icon}
           </div>
-          <h1 className="text-3xl font-bold text-center mb-4 transition-all duration-300 animate-fadeIn">
+          <h1 className="text-3xl font-bold text-center mb-4">
             {screens[currentScreen].title}
           </h1>
-          <p className="text-muted-foreground text-center text-lg mb-8 transition-all duration-300 animate-fadeIn">
+          <p className="text-muted-foreground text-center text-lg mb-8">
             {screens[currentScreen].description}
           </p>
         </Card>

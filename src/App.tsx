@@ -38,6 +38,10 @@ import Statements from "./pages/profile/Statements";
 import Rewards from "./pages/profile/Rewards";
 import Referrals from "./pages/profile/Referrals";
 import Favorites from "./pages/profile/Favorites";
+import Water from "./pages/services/Water";
+import Internet from "./pages/services/Internet";
+import Gaming from "./pages/services/Gaming";
+import Betting from "./pages/services/Betting";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +91,10 @@ const App = () => (
                 <Route path="/bills/hotels" element={<HotelBooking />} />
                 <Route path="/bills/insurance" element={<Insurance />} />
                 <Route path="/bills/education" element={<Education />} />
+                <Route path="/bills/water" element={<Water />} />
+                <Route path="/bills/internet" element={<Internet />} />
+                <Route path="/bills/gaming" element={<Gaming />} />
+                <Route path="/bills/betting" element={<Betting />} />
                 {/* Catch-all route for 404 handling */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
