@@ -28,8 +28,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       root.style.setProperty("--foreground", "#ffffff");
       root.style.setProperty("--card", "#121212");
       root.style.setProperty("--card-foreground", "#ffffff");
-      root.style.setProperty("--primary", "#ffffff");
-      root.style.setProperty("--primary-foreground", "#000000");
+      root.style.setProperty("--primary", "#1EAEDB");
+      root.style.setProperty("--primary-foreground", "#ffffff");
       root.style.setProperty("--muted", "#1e1e1e");
       root.style.setProperty("--muted-foreground", "#a0a0a0");
       root.style.setProperty("--border", "#333333");
@@ -39,7 +39,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       root.style.setProperty("--foreground", "#000000");
       root.style.setProperty("--card", "#ffffff");
       root.style.setProperty("--card-foreground", "#000000");
-      root.style.setProperty("--primary", "#0066ff");
+      root.style.setProperty("--primary", "#1EAEDB");
       root.style.setProperty("--primary-foreground", "#ffffff");
       root.style.setProperty("--muted", "#f5f5f5");
       root.style.setProperty("--muted-foreground", "#6b7280");

@@ -68,11 +68,11 @@ const StartupScreens = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       <div className="absolute top-4 right-4">
         <Button 
           variant="ghost" 
-          className="text-sm"
+          className="text-sm glass-card"
           onClick={handleSkip}
         >
           Skip
@@ -80,7 +80,7 @@ const StartupScreens = () => {
       </div>
       
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        <Card className={`p-8 w-full max-w-md mx-auto ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 ${screens[currentScreen].animation}`}>
+        <Card className={`p-8 w-full max-w-md mx-auto glass-card ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 ${screens[currentScreen].animation}`}>
           <div className="flex justify-center mb-6 transition-all duration-300 animate-bounce">
             {screens[currentScreen].icon}
           </div>
@@ -108,7 +108,7 @@ const StartupScreens = () => {
       <div className="p-6">
         {currentScreen < screens.length - 1 ? (
           <Button 
-            className="w-full flex items-center justify-center" 
+            className="w-full flex items-center justify-center glass-card" 
             size="lg"
             onClick={goToNextScreen}
           >
@@ -117,7 +117,7 @@ const StartupScreens = () => {
           </Button>
         ) : (
           <Button 
-            className="w-full" 
+            className="w-full glass-card" 
             size="lg"
             onClick={handleGetStarted}
           >

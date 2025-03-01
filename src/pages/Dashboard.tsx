@@ -42,7 +42,7 @@ const Dashboard = () => {
     <DashboardLayout>
       <div className="space-y-6 fade-in max-w-md mx-auto">
         {/* Main Wallet Card */}
-        <Card className="light-purple-card p-6">
+        <Card className="light-purple-card p-6 glass-card">
           <div className="flex justify-between items-center mb-2">
             <div className="flex items-center space-x-2">
               <CreditCard className="h-5 w-5" />
@@ -72,7 +72,7 @@ const Dashboard = () => {
               className="text-center cursor-pointer"
               onClick={() => navigate(service.route)}
             >
-              <div className={`${service.color} h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-2`}>
+              <div className={`${service.color} h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-2 glass-card`}>
                 <service.icon className="h-6 w-6 text-white" />
               </div>
               <p className="text-xs font-medium">{service.name}</p>
@@ -92,7 +92,7 @@ const Dashboard = () => {
           <div className="space-y-3">
             {recentActivities.length > 0 ? (
               recentActivities.map((activity) => (
-                <div key={activity.id} className="activity-item">
+                <div key={activity.id} className="activity-item glass-card">
                   <div className="flex items-center">
                     <div className={`${activity.type === 'credit' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-amber-100 dark:bg-amber-900/20'} p-3 rounded-full mr-3`}>
                       {activity.type === 'credit' ? (
@@ -112,7 +112,7 @@ const Dashboard = () => {
                 </div>
               ))
             ) : (
-              <div className="text-center p-8 bg-muted/20 rounded-lg">
+              <div className="text-center p-8 bg-muted/20 rounded-lg glass-card">
                 <Clock className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-muted-foreground">No recent activities</p>
                 <p className="text-sm text-muted-foreground">Your transactions will appear here</p>
