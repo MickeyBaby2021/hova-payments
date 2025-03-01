@@ -39,7 +39,14 @@ import Rewards from "./pages/profile/Rewards";
 import Referrals from "./pages/profile/Referrals";
 import Favorites from "./pages/profile/Favorites";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -80,6 +87,7 @@ const App = () => (
                 <Route path="/bills/hotels" element={<HotelBooking />} />
                 <Route path="/bills/insurance" element={<Insurance />} />
                 <Route path="/bills/education" element={<Education />} />
+                {/* Catch-all route for 404 handling */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

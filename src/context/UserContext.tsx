@@ -40,6 +40,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(defaultUser);
   const [isLoading, setIsLoading] = useState(false);
+  // Initialize with empty array - no dummy data
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const setUser = (newUser: User) => {
@@ -89,7 +90,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       addTransaction({
         type: "debit",
         amount: amount,
-        description: "Bill payment",
+        description: "Payment",
         status: "success"
       });
       
@@ -114,7 +115,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (transaction.type === "credit") {
       toast.success(`₦${transaction.amount.toLocaleString()} added to your wallet`);
     } else {
-      toast.success(`₦${transaction.amount.toLocaleString()} deducted from your wallet`);
+      toast.success(`₦${transaction.amount.toLocaleString()} has been paid successfully`);
     }
   };
 

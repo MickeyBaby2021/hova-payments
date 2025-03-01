@@ -1,4 +1,3 @@
-
 import { toast } from "sonner";
 
 // Live API keys
@@ -48,8 +47,13 @@ export const initiateFlutterwavePayment = async (details: PaymentDetails): Promi
     
     return new Promise((resolve, reject) => {
       const loadFlutterwaveScript = () => {
+        // Remove any existing scripts to prevent conflicts
+        const existingScripts = document.querySelectorAll('script[src*="flutterwave"]');
+        existingScripts.forEach(script => script.remove());
+        
         const script = document.createElement('script');
         script.src = 'https://checkout.flutterwave.com/v3.js';
+        script.async = true;
         document.body.appendChild(script);
         
         script.onload = () => {
@@ -103,46 +107,8 @@ export const initiateFlutterwavePayment = async (details: PaymentDetails): Promi
         };
       };
       
-      // Check if FlutterwaveCheckout is already available
-      if (typeof window.FlutterwaveCheckout !== 'undefined') {
-        const paymentConfig = {
-          public_key: FLUTTERWAVE_PUBLIC_KEY,
-          tx_ref: `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`,
-          amount: details.amount,
-          currency: "NGN",
-          payment_options: "card,banktransfer,ussd",
-          customer: {
-            email: details.email || "customer@example.com",
-            phone_number: details.phone || "",
-            name: details.name || "Customer",
-          },
-          customizations: {
-            title: "HovaPay",
-            description: "Fund your HovaPay wallet",
-            logo: "https://example.com/logo.png",
-          },
-          callback: function(response: any) {
-            console.log("Flutterwave payment response:", response);
-            if (response.status === "successful") {
-              // Verify the transaction with your backend in production
-              toast.success("Payment successful!");
-              resolve(details.amount);
-            } else {
-              toast.error("Payment failed. Please try again.");
-              resolve(null);
-            }
-          },
-          onclose: function() {
-            toast.info("Payment window closed");
-            resolve(null);
-          }
-        };
-        
-        // Launch Flutterwave checkout
-        window.FlutterwaveCheckout(paymentConfig);
-      } else {
-        loadFlutterwaveScript();
-      }
+      // Always reload the script to avoid initialization issues
+      loadFlutterwaveScript();
     });
   } catch (error) {
     console.error("Flutterwave payment error:", error);
@@ -168,51 +134,58 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
         
         script.onload = () => {
           setTimeout(() => {
-            if (typeof window.MonnifySDK !== 'undefined') {
+            try {
+              if (typeof window.MonnifySDK === 'undefined') {
+                throw new Error("Monnify SDK not loaded");
+              }
+              
               const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-              try {
-                window.MonnifySDK.initialize({
-                  amount: details.amount,
-                  currency: "NGN",
-                  reference: details.reference || reference,
-                  customerName: details.name || "Customer",
-                  customerEmail: details.email || "customer@example.com",
-                  customerPhoneNumber: details.phone || "",
-                  apiKey: MONNIFY_API_KEY,
-                  contractCode: MONNIFY_CONTRACT_CODE,
-                  paymentDescription: "Fund HovaPay wallet",
-                  isTestMode: true, // Change to false for production
-                  onComplete: function(response: any) {
-                    console.log("Monnify payment response:", response);
-                    if (response.status === "SUCCESS") {
-                      // Verify the transaction with your backend in production
-                      toast.success("Payment successful!");
-                      resolve(details.amount);
-                    } else {
-                      toast.error("Payment failed. Please try again.");
-                      resolve(null);
-                    }
-                  },
-                  onClose: function(data: any) {
-                    console.log("Monnify payment closed:", data);
-                    toast.info("Payment window closed");
+              
+              window.MonnifySDK.initialize({
+                amount: details.amount,
+                currency: "NGN",
+                reference: details.reference || reference,
+                customerName: details.name || "Customer",
+                customerEmail: details.email || "customer@example.com",
+                customerPhoneNumber: details.phone || "",
+                apiKey: MONNIFY_API_KEY,
+                contractCode: MONNIFY_CONTRACT_CODE,
+                paymentDescription: "Fund HovaPay wallet",
+                isTestMode: true, // Change to false for production
+                paymentMethods: ["CARD", "ACCOUNT_TRANSFER"],
+                onComplete: function(response: any) {
+                  console.log("Monnify payment response:", response);
+                  if (response.status === "SUCCESS") {
+                    toast.success("Payment successful!");
+                    resolve(details.amount);
+                  } else {
+                    toast.error("Payment failed. Please try again.");
                     resolve(null);
                   }
-                });
-                
-                // Open payment modal
-                window.MonnifySDK.openIframe();
-              } catch (error) {
-                console.error("Error initializing Monnify:", error);
-                toast.error("Failed to initialize payment. Please try again.");
-                reject(error);
-              }
-            } else {
-              console.error("Failed to load Monnify SDK");
-              toast.error("Payment service unavailable. Please try again later.");
-              reject(new Error("Failed to load Monnify SDK"));
+                },
+                onClose: function(data: any) {
+                  console.log("Monnify payment closed:", data);
+                  toast.info("Payment window closed");
+                  resolve(null);
+                }
+              });
+              
+              // Give a brief delay to ensure SDK is ready
+              setTimeout(() => {
+                try {
+                  window.MonnifySDK.openIframe();
+                } catch (error) {
+                  console.error("Error opening Monnify iframe:", error);
+                  toast.error("Failed to open payment page. Please try again.");
+                  reject(error);
+                }
+              }, 500);
+            } catch (error) {
+              console.error("Error initializing Monnify:", error);
+              toast.error("Failed to initialize payment. Please try again.");
+              reject(error);
             }
-          }, 1000); // Give the script time to initialize properly
+          }, 1000); // Give time for SDK to initialize
         };
         
         script.onerror = () => {
@@ -237,7 +210,6 @@ export const payBill = async (details: BillPaymentDetails): Promise<boolean> => 
   try {
     console.log("Processing bill payment with details:", details);
     
-    // In a production environment, these API calls should be made from your backend
     // Create VTPass request body
     const requestBody = {
       serviceID: details.serviceID,
@@ -252,16 +224,18 @@ export const payBill = async (details: BillPaymentDetails): Promise<boolean> => 
     
     console.log("VTPass request:", requestBody);
     
-    // In real implementation, make HTTP request to VTPass API
-    // This would use the API keys securely on the server side
-    // For now, we'll simulate a successful response
+    // In real implementation with backend integration, we would make an actual HTTP request
+    // to the VTPass API using the provided keys
+    // For now, we'll simulate a response - this would be replaced with actual API calls
+    
+    // Simulate API call delay
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Simulate successful payment (90% chance)
+        // Simulate payment success (90% success rate)
         const isSuccessful = Math.random() < 0.9;
         
         if (isSuccessful) {
-          toast.success("Payment successful!");
+          toast.success(`Payment for ${details.serviceID} successful!`);
           resolve(true);
         } else {
           toast.error("Payment failed. Please try again.");
@@ -281,10 +255,10 @@ export const fetchServiceVariations = async (serviceID: string): Promise<any[] |
   try {
     console.log(`Fetching variations for service: ${serviceID}`);
     
-    // In a real implementation, we'd make a proper API call to VTPass
-    // Since we're using live keys, we should structure this properly
+    // In a real implementation with backend integration, this would be a proper API call
+    // to the VTPass API using the provided keys
     
-    // Mock data for development - in production this would come from the VTPass API
+    // Mock data for development - would be replaced with actual API responses
     const mockVariations: Record<string, any[]> = {
       'mtn-data': [
         { variation_code: 'mtn-10mb-100', name: '100 Naira - 10MB - Daily', amount: 100, validity: '1 day' },
@@ -371,13 +345,13 @@ export const verifyCustomer = async (
   try {
     console.log(`Verifying customer: ${serviceID}, ${billersCode}, ${type}`);
     
-    // In a real implementation, this would be a backend API call to VTPass
-    // Using the API keys securely on the server side
+    // In a real implementation with backend integration, this would be a proper API call
+    // to the VTPass API using the provided keys
     
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
-        // Mock customer data
+        // This is mock data - would be replaced with actual API responses
         const mockCustomers: Record<string, any> = {
           // Electricity customers
           '1234567890': { name: 'John Doe', address: '123 Main St', status: 'active' },

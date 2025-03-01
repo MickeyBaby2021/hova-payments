@@ -25,25 +25,29 @@ const StartupScreens = () => {
       title: "Welcome to HovaPay",
       description: "Your one-stop solution for all bill payments and financial services.",
       icon: <ShieldCheck className="h-16 w-16 text-primary" />,
-      color: "bg-primary/10"
+      color: "bg-primary/10",
+      animation: "animate-fadeIn"
     },
     {
       title: "Pay bills effortlessly",
       description: "Fast and secure payments for airtime, data, electricity, TV subscriptions and more.",
       icon: <Zap className="h-16 w-16 text-primary" />,
-      color: "bg-primary/10"
+      color: "bg-primary/10",
+      animation: "animate-slideInRight"
     },
     {
       title: "Secure wallet system",
       description: "Fund your wallet once and make multiple payments without stress.",
       icon: <WalletIcon className="h-16 w-16 text-indigo-600" />,
-      color: "bg-indigo-100 dark:bg-indigo-950/30"
+      color: "bg-indigo-100 dark:bg-indigo-950/30",
+      animation: "animate-slideInUp"
     },
     {
       title: "Multiple payment options",
       description: "Pay with cards, bank transfers, or mobile money. It's your choice.",
       icon: <CreditCard className="h-16 w-16 text-green-600" />,
-      color: "bg-green-100 dark:bg-green-950/30"
+      color: "bg-green-100 dark:bg-green-950/30",
+      animation: "animate-pulse"
     }
   ];
 
@@ -65,9 +69,19 @@ const StartupScreens = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="ghost" 
+          className="text-sm"
+          onClick={handleSkip}
+        >
+          Skip
+        </Button>
+      </div>
+      
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        <Card className={`p-8 w-full max-w-md mx-auto ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 animate-fadeIn`}>
-          <div className="flex justify-center mb-6 transition-all duration-300 animate-scaleIn">
+        <Card className={`p-8 w-full max-w-md mx-auto ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 ${screens[currentScreen].animation}`}>
+          <div className="flex justify-center mb-6 transition-all duration-300 animate-bounce">
             {screens[currentScreen].icon}
           </div>
           <h1 className="text-3xl font-bold text-center mb-4 transition-all duration-300 animate-fadeIn">
@@ -91,7 +105,7 @@ const StartupScreens = () => {
         </div>
       </div>
 
-      <div className="p-6 space-y-4">
+      <div className="p-6">
         {currentScreen < screens.length - 1 ? (
           <Button 
             className="w-full flex items-center justify-center" 
@@ -110,13 +124,6 @@ const StartupScreens = () => {
             Get Started
           </Button>
         )}
-        <Button 
-          className="w-full" 
-          variant="ghost"
-          onClick={handleSkip}
-        >
-          Skip
-        </Button>
       </div>
     </div>
   );

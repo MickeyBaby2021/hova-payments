@@ -45,7 +45,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       {/* Top Navigation */}
-      <nav className="bg-card shadow-sm fixed w-full z-50 px-4 py-3">
+      <nav className={`fixed w-full z-50 px-4 py-3 ${theme === 'dark' ? 'bg-black border-b border-gray-800' : 'bg-white border-b border-gray-100'} shadow-sm`}>
         <div className="container mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <h1 className="text-xl font-bold text-primary">HovaPay</h1>
@@ -60,7 +60,9 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <Button variant="ghost" size="icon" className="rounded-full relative">
                   <Bell className="h-5 w-5" />
                   {unreadCount > 0 && (
-                    <span className="notification-badge">{unreadCount}</span>
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
                   )}
                 </Button>
               </PopoverTrigger>
@@ -79,7 +81,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                     notifications.map((notification) => (
                       <div 
                         key={notification.id} 
-                        className={`notification-item ${!notification.read ? 'notification-item-unread' : ''}`}
+                        className={`p-3 ${!notification.read ? (theme === 'dark' ? 'bg-gray-900' : 'bg-blue-50') : ''}`}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
@@ -124,7 +126,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
               </Avatar>
               <div className="hidden md:block">
                 <p className="font-medium text-sm">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">Good Morning!</p>
+                <p className="text-xs text-muted-foreground">Hello!</p>
               </div>
             </div>
           </div>
@@ -139,37 +141,37 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       </main>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-card border-t flex justify-around items-center py-2 px-4 z-40">
+      <div className={`fixed bottom-0 left-0 right-0 ${theme === 'dark' ? 'bg-black border-t border-gray-800' : 'bg-white border-t border-gray-200'} flex justify-around items-center py-2 px-4 z-40`}>
         <Button
           variant="ghost"
-          className={`nav-item ${isActive('/dashboard') ? 'active' : ''}`}
+          className={`flex flex-col items-center justify-center h-auto py-1 ${isActive('/dashboard') ? 'text-primary' : ''}`}
           onClick={() => navigate('/dashboard')}
         >
-          <Home className="h-6 w-6" />
+          <Home className="h-5 w-5" />
           <span className="text-xs mt-1">Home</span>
         </Button>
         <Button
           variant="ghost"
-          className={`nav-item ${isActive('/wallet') ? 'active' : ''}`}
+          className={`flex flex-col items-center justify-center h-auto py-1 ${isActive('/wallet') ? 'text-primary' : ''}`}
           onClick={() => navigate('/wallet')}
         >
-          <WalletIcon className="h-6 w-6" />
+          <WalletIcon className="h-5 w-5" />
           <span className="text-xs mt-1">Wallet</span>
         </Button>
         <Button
           variant="ghost"
-          className={`nav-item ${isActive('/bills') ? 'active' : ''}`}
+          className={`flex flex-col items-center justify-center h-auto py-1 ${isActive('/bills') ? 'text-primary' : ''}`}
           onClick={() => navigate('/bills')}
         >
-          <Receipt className="h-6 w-6" />
+          <Receipt className="h-5 w-5" />
           <span className="text-xs mt-1">Services</span>
         </Button>
         <Button
           variant="ghost"
-          className={`nav-item ${isActive('/transactions') ? 'active' : ''}`}
+          className={`flex flex-col items-center justify-center h-auto py-1 ${isActive('/transactions') ? 'text-primary' : ''}`}
           onClick={() => navigate('/transactions')}
         >
-          <History className="h-6 w-6" />
+          <History className="h-5 w-5" />
           <span className="text-xs mt-1">History</span>
         </Button>
       </div>

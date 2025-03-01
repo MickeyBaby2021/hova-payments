@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Send, MessageSquare } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 interface Message {
   id: number;
@@ -27,6 +28,7 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
   ]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -79,33 +81,39 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="chat-widget">
-      <div className="chat-widget-header">
+    <div className={`fixed bottom-20 right-4 w-80 sm:w-96 z-50 rounded-lg shadow-lg overflow-hidden flex flex-col ${theme === 'dark' ? 'bg-black border border-gray-700' : 'bg-white border border-gray-200'} max-h-[500px]`}>
+      <div className="chat-widget-header bg-primary p-3 flex justify-between items-center">
         <div className="flex items-center">
-          <MessageSquare className="h-5 w-5 mr-2" />
-          <span>Chat Support</span>
+          <MessageSquare className="h-5 w-5 mr-2 text-primary-foreground" />
+          <span className="text-primary-foreground font-medium">Chat Support</span>
         </div>
-        <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-primary-foreground/10">
+        <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-primary-foreground/10">
           <X className="h-5 w-5" />
         </Button>
       </div>
       
-      <div className="chat-widget-content">
+      <div className={`flex-1 p-4 overflow-y-auto ${theme === 'dark' ? 'bg-black' : 'bg-gray-50'}`} style={{ maxHeight: "350px" }}>
         {messages.map((message) => (
           <div 
             key={message.id} 
-            className={`chat-bubble ${message.sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-agent'}`}
+            className={`mb-4 max-w-[80%] ${message.sender === 'user' ? 'ml-auto' : 'mr-auto'}`}
           >
-            {message.text}
-            <div className="text-xs opacity-70 mt-1">
-              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <div className={`p-3 rounded-lg ${
+              message.sender === 'user' 
+                ? 'bg-primary text-primary-foreground' 
+                : theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-800'
+            }`}>
+              {message.text}
+              <div className="text-xs opacity-70 mt-1">
+                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
       
-      <div className="chat-widget-input">
+      <div className={`p-3 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} flex items-center`}>
         <Input
           placeholder="Type your message..."
           value={inputValue}
