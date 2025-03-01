@@ -21,42 +21,15 @@ import {
   ArrowDown,
   ArrowUp,
   Receipt,
+  Clock
 } from "lucide-react";
 
 const Dashboard = () => {
-  const { user } = useUser();
+  const { user, transactions } = useUser();
   const navigate = useNavigate();
   
-  // Mock transactions
-  const activities = [
-    {
-      id: 1,
-      type: "debit",
-      amount: 31350,
-      title: "Netflix Premium",
-      date: "22 Jun 2024 - 12:00 PM",
-      icon: Tv,
-      iconBg: "bg-amber-100"
-    },
-    {
-      id: 2,
-      type: "credit",
-      amount: 58500,
-      title: "Received Money",
-      date: "20 Jun 2024 - 1:20 PM",
-      icon: ArrowDown,
-      iconBg: "bg-blue-100"
-    },
-    {
-      id: 3,
-      type: "debit",
-      amount: 5850,
-      title: "Spotify Premium",
-      date: "19 Jun 2024 - 4:00 PM",
-      icon: CreditCard,
-      iconBg: "bg-amber-100"
-    },
-  ];
+  // Get real transactions
+  const recentActivities = transactions.slice(0, 3);
 
   const quickServices = [
     { icon: Send, name: "Transfer", color: "bg-primary", route: "/transfer" },
@@ -80,12 +53,14 @@ const Dashboard = () => {
           <div className="my-3">
             <h1 className="text-4xl font-bold">₦{user?.balance.toLocaleString()}</h1>
           </div>
-          <div className="flex justify-between items-center text-sm">
-            <div className="flex items-center">
-              <ArrowUp className="h-4 w-4 mr-1 text-green-500" />
-              <span className="font-medium">8.82%</span>
-              <span className="text-green-500 ml-1">(+₦970)</span>
-            </div>
+          <div className="flex justify-between items-center">
+            <Button 
+              variant="outline" 
+              className="bg-white/20 hover:bg-white/30 border-white/40 text-white"
+              onClick={() => navigate('/wallet')}
+            >
+              Fund Wallet
+            </Button>
           </div>
         </Card>
 
@@ -115,22 +90,41 @@ const Dashboard = () => {
           </div>
           
           <div className="space-y-3">
-            {activities.map((activity) => (
-              <div key={activity.id} className="activity-item">
-                <div className="flex items-center">
-                  <div className={`${activity.iconBg} p-3 rounded-full mr-3`}>
-                    <activity.icon className="h-5 w-5" />
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity) => (
+                <div key={activity.id} className="activity-item">
+                  <div className="flex items-center">
+                    <div className={`${activity.type === 'credit' ? 'bg-blue-100 dark:bg-blue-900/20' : 'bg-amber-100 dark:bg-amber-900/20'} p-3 rounded-full mr-3`}>
+                      {activity.type === 'credit' ? (
+                        <ArrowDown className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      ) : (
+                        <ArrowUp className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium text-sm">{activity.description}</p>
+                      <p className="text-xs text-gray-500">{new Date(activity.date).toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-sm">{activity.title}</p>
-                    <p className="text-xs text-gray-500">{activity.date}</p>
+                  <div className={`text-sm font-semibold ${activity.type === "credit" ? "text-green-600" : "text-red-600"}`}>
+                    {activity.type === "credit" ? "+" : "-"}₦{activity.amount.toLocaleString()}
                   </div>
                 </div>
-                <div className={`text-sm font-semibold ${activity.type === "credit" ? "text-green-600" : "text-red-600"}`}>
-                  {activity.type === "credit" ? "+" : "-"}₦{activity.amount.toLocaleString()}
-                </div>
+              ))
+            ) : (
+              <div className="text-center p-8 bg-muted/20 rounded-lg">
+                <Clock className="h-10 w-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">No recent activities</p>
+                <p className="text-sm text-muted-foreground">Your transactions will appear here</p>
+                <Button 
+                  variant="outline" 
+                  className="mt-4"
+                  onClick={() => navigate('/wallet')}
+                >
+                  Fund Wallet
+                </Button>
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

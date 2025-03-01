@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -10,13 +10,14 @@ import { ArrowLeft, User, Mail, Phone, Lock, Camera, Loader2 } from "lucide-reac
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
 import { toast } from "sonner";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, setUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -92,6 +93,36 @@ const Profile = () => {
     }, 1500);
   };
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      setFormData(prev => ({
+        ...prev,
+        avatar: result
+      }));
+      
+      // In a real app with backend, you would upload the image to a server
+      // and get a URL back to store in the user object
+      if (user) {
+        setUser({
+          ...user,
+          avatar: result
+        });
+      }
+      
+      toast.success("Profile picture updated");
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 fade-in max-w-md mx-auto">
@@ -110,15 +141,24 @@ const Profile = () => {
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
             <Avatar className="h-24 w-24 border-4 border-primary mb-2">
-              <img src={user?.avatar} alt={user?.name} />
+              <AvatarImage src={user?.avatar} alt={user?.name} />
+              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <Button 
               variant="outline" 
               size="icon" 
               className="absolute bottom-1 right-0 rounded-full bg-white dark:bg-gray-800"
+              onClick={handleUploadClick}
             >
               <Camera className="h-4 w-4" />
             </Button>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              className="hidden"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
           </div>
           <h2 className="text-xl font-semibold mt-2">{user?.name}</h2>
           <p className="text-muted-foreground">{user?.email}</p>

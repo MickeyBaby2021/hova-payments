@@ -64,7 +64,7 @@ const App = () => (
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/security" element={<Security />} />
                 <Route path="/preferences" element={<Preferences />} />
-                <Route path="/ewallet" element={<CardsAndBanks />} />
+                <Route path="/cards-and-banks" element={<CardsAndBanks />} />
                 <Route path="/support" element={<Support />} />
                 <Route path="/statements" element={<Statements />} />
                 <Route path="/rewards" element={<Rewards />} />

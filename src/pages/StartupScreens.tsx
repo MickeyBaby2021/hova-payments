@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { WalletIcon, Zap, CreditCard, ShieldCheck } from "lucide-react";
+import { WalletIcon, Zap, CreditCard, ShieldCheck, ArrowRight } from "lucide-react";
 
 const StartupScreens = () => {
   const [currentScreen, setCurrentScreen] = useState(0);
@@ -12,7 +12,7 @@ const StartupScreens = () => {
   useEffect(() => {
     // Auto-advance screens after delay
     const timer = setTimeout(() => {
-      if (currentScreen < 2) {
+      if (currentScreen < screens.length - 1) {
         setCurrentScreen(prev => prev + 1);
       }
     }, 3000);
@@ -21,6 +21,12 @@ const StartupScreens = () => {
   }, [currentScreen]);
 
   const screens = [
+    {
+      title: "Welcome to HovaPay",
+      description: "Your one-stop solution for all bill payments and financial services.",
+      icon: <ShieldCheck className="h-16 w-16 text-primary" />,
+      color: "bg-primary/10"
+    },
     {
       title: "Pay bills effortlessly",
       description: "Fast and secure payments for airtime, data, electricity, TV subscriptions and more.",
@@ -49,17 +55,25 @@ const StartupScreens = () => {
     navigate("/login");
   };
 
+  const goToNextScreen = () => {
+    if (currentScreen < screens.length - 1) {
+      setCurrentScreen(prev => prev + 1);
+    } else {
+      handleGetStarted();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        <Card className={`p-8 w-full max-w-md mx-auto ${screens[currentScreen].color} border-none shadow-lg`}>
-          <div className="flex justify-center mb-6">
+        <Card className={`p-8 w-full max-w-md mx-auto ${screens[currentScreen].color} border-none shadow-lg transition-all duration-500 animate-fadeIn`}>
+          <div className="flex justify-center mb-6 transition-all duration-300 animate-scaleIn">
             {screens[currentScreen].icon}
           </div>
-          <h1 className="text-3xl font-bold text-center mb-4">
+          <h1 className="text-3xl font-bold text-center mb-4 transition-all duration-300 animate-fadeIn">
             {screens[currentScreen].title}
           </h1>
-          <p className="text-muted-foreground text-center text-lg mb-8">
+          <p className="text-muted-foreground text-center text-lg mb-8 transition-all duration-300 animate-fadeIn">
             {screens[currentScreen].description}
           </p>
         </Card>
@@ -68,7 +82,7 @@ const StartupScreens = () => {
           {screens.map((_, index) => (
             <div 
               key={index}
-              className={`h-2 rounded-full transition-all duration-300 ${
+              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
                 currentScreen === index ? "w-8 bg-primary" : "w-2 bg-muted"
               }`}
               onClick={() => setCurrentScreen(index)}
@@ -78,13 +92,24 @@ const StartupScreens = () => {
       </div>
 
       <div className="p-6 space-y-4">
-        <Button 
-          className="w-full" 
-          size="lg"
-          onClick={handleGetStarted}
-        >
-          Get Started
-        </Button>
+        {currentScreen < screens.length - 1 ? (
+          <Button 
+            className="w-full flex items-center justify-center" 
+            size="lg"
+            onClick={goToNextScreen}
+          >
+            Continue
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          <Button 
+            className="w-full" 
+            size="lg"
+            onClick={handleGetStarted}
+          >
+            Get Started
+          </Button>
+        )}
         <Button 
           className="w-full" 
           variant="ghost"

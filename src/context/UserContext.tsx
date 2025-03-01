@@ -31,7 +31,7 @@ interface UserContextType {
 const defaultUser: User = {
   name: "Rupak Chakraborty",
   email: "rupak@example.com",
-  balance: 1000, // Starting with a small balance
+  balance: 0,
   avatar: "https://i.pravatar.cc/150?img=8",
 };
 

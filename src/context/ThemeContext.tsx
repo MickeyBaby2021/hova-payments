@@ -12,6 +12,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(() => {
+    // Default to light mode
     const savedTheme = localStorage.getItem("hovapay-theme");
     return (savedTheme as Theme) || "light";
   });

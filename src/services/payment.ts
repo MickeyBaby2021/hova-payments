@@ -6,8 +6,8 @@ const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-74be39c311f3587fe01840dcddccf343-X";
 const FLUTTERWAVE_SECRET_KEY = "FLWSECK-ab617884f87288b06c9412c9c237aff0-195066ecf9avt-X";
 const FLUTTERWAVE_ENCRYPTION_KEY = "ab617884f8720b8e974a80dd";
 
-const MONNIFY_API_KEY = "MK_TEST_SAF7HR5F3F"; // Replace with your live Monnify key
-const MONNIFY_CONTRACT_CODE = "4934121693"; // Replace with your live Monnify contract code
+const MONNIFY_API_KEY = "MK_TEST_SAF7HR5F3F"; // Using test key until production ready
+const MONNIFY_CONTRACT_CODE = "4934121693";
 
 const VTPASS_API_KEY = "PK_11668ef461c7ceb02a36b82b625db967c359a025d6c";
 const VTPASS_SECRET_KEY = "SK_123e0d7e681a947ea1f9af3c5723ef55df3ec67d18e";
@@ -157,56 +157,62 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
     
     return new Promise((resolve, reject) => {
       const loadMonnifyScript = () => {
+        // Remove any existing Monnify scripts to prevent conflicts
+        const existingScripts = document.querySelectorAll('script[src*="monnify.js"]');
+        existingScripts.forEach(script => script.remove());
+        
         const script = document.createElement('script');
         script.src = 'https://sdk.monnify.com/plugin/monnify.js';
         script.async = true;
         document.body.appendChild(script);
         
         script.onload = () => {
-          if (typeof window.MonnifySDK !== 'undefined') {
-            const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-            try {
-              window.MonnifySDK.initialize({
-                amount: details.amount,
-                currency: "NGN",
-                reference: details.reference || reference,
-                customerName: details.name || "Customer",
-                customerEmail: details.email || "customer@example.com",
-                customerPhoneNumber: details.phone || "",
-                apiKey: MONNIFY_API_KEY,
-                contractCode: MONNIFY_CONTRACT_CODE,
-                paymentDescription: "Fund HovaPay wallet",
-                isTestMode: true, // Changed to test mode to ensure it works
-                onComplete: function(response: any) {
-                  console.log("Monnify payment response:", response);
-                  if (response.status === "SUCCESS") {
-                    // Verify the transaction with your backend in production
-                    toast.success("Payment successful!");
-                    resolve(details.amount);
-                  } else {
-                    toast.error("Payment failed. Please try again.");
+          setTimeout(() => {
+            if (typeof window.MonnifySDK !== 'undefined') {
+              const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+              try {
+                window.MonnifySDK.initialize({
+                  amount: details.amount,
+                  currency: "NGN",
+                  reference: details.reference || reference,
+                  customerName: details.name || "Customer",
+                  customerEmail: details.email || "customer@example.com",
+                  customerPhoneNumber: details.phone || "",
+                  apiKey: MONNIFY_API_KEY,
+                  contractCode: MONNIFY_CONTRACT_CODE,
+                  paymentDescription: "Fund HovaPay wallet",
+                  isTestMode: true, // Change to false for production
+                  onComplete: function(response: any) {
+                    console.log("Monnify payment response:", response);
+                    if (response.status === "SUCCESS") {
+                      // Verify the transaction with your backend in production
+                      toast.success("Payment successful!");
+                      resolve(details.amount);
+                    } else {
+                      toast.error("Payment failed. Please try again.");
+                      resolve(null);
+                    }
+                  },
+                  onClose: function(data: any) {
+                    console.log("Monnify payment closed:", data);
+                    toast.info("Payment window closed");
                     resolve(null);
                   }
-                },
-                onClose: function(data: any) {
-                  console.log("Monnify payment closed:", data);
-                  toast.info("Payment window closed");
-                  resolve(null);
-                }
-              });
-              
-              // Open payment modal
-              window.MonnifySDK.openIframe();
-            } catch (error) {
-              console.error("Error initializing Monnify:", error);
-              toast.error("Failed to initialize payment. Please try again.");
-              reject(error);
+                });
+                
+                // Open payment modal
+                window.MonnifySDK.openIframe();
+              } catch (error) {
+                console.error("Error initializing Monnify:", error);
+                toast.error("Failed to initialize payment. Please try again.");
+                reject(error);
+              }
+            } else {
+              console.error("Failed to load Monnify SDK");
+              toast.error("Payment service unavailable. Please try again later.");
+              reject(new Error("Failed to load Monnify SDK"));
             }
-          } else {
-            console.error("Failed to load Monnify SDK");
-            toast.error("Payment service unavailable. Please try again later.");
-            reject(new Error("Failed to load Monnify SDK"));
-          }
+          }, 1000); // Give the script time to initialize properly
         };
         
         script.onerror = () => {
@@ -216,49 +222,8 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
         };
       };
       
-      // Check if MonnifySDK is already available
-      if (typeof window.MonnifySDK !== 'undefined') {
-        const reference = `hova-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-        try {
-          window.MonnifySDK.initialize({
-            amount: details.amount,
-            currency: "NGN",
-            reference: details.reference || reference,
-            customerName: details.name || "Customer",
-            customerEmail: details.email || "customer@example.com",
-            customerPhoneNumber: details.phone || "",
-            apiKey: MONNIFY_API_KEY,
-            contractCode: MONNIFY_CONTRACT_CODE,
-            paymentDescription: "Fund HovaPay wallet",
-            isTestMode: true, // Changed to test mode to ensure it works
-            onComplete: function(response: any) {
-              console.log("Monnify payment response:", response);
-              if (response.status === "SUCCESS") {
-                // Verify the transaction with your backend in production
-                toast.success("Payment successful!");
-                resolve(details.amount);
-              } else {
-                toast.error("Payment failed. Please try again.");
-                resolve(null);
-              }
-            },
-            onClose: function(data: any) {
-              console.log("Monnify payment closed:", data);
-              toast.info("Payment window closed");
-              resolve(null);
-            }
-          });
-          
-          // Open payment modal
-          window.MonnifySDK.openIframe();
-        } catch (error) {
-          console.error("Error initializing Monnify:", error);
-          toast.error("Failed to initialize payment. Please try again.");
-          reject(error);
-        }
-      } else {
-        loadMonnifyScript();
-      }
+      // Always reload the script for Monnify to avoid initialization issues
+      loadMonnifyScript();
     });
   } catch (error) {
     console.error("Monnify payment error:", error);
@@ -267,13 +232,12 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
   }
 };
 
+// VTPass API integration for bill payments
 export const payBill = async (details: BillPaymentDetails): Promise<boolean> => {
   try {
     console.log("Processing bill payment with details:", details);
     
     // In a production environment, these API calls should be made from your backend
-    // for security reasons. This is a simplified frontend implementation.
-    
     // Create VTPass request body
     const requestBody = {
       serviceID: details.serviceID,
@@ -288,10 +252,9 @@ export const payBill = async (details: BillPaymentDetails): Promise<boolean> => 
     
     console.log("VTPass request:", requestBody);
     
-    // In a real implementation, this would be a backend API call to VTPass
-    // Using the API keys securely on the server side
-    
-    // Simulate API call for now, but in production integrate with your backend
+    // In real implementation, make HTTP request to VTPass API
+    // This would use the API keys securely on the server side
+    // For now, we'll simulate a successful response
     return new Promise((resolve) => {
       setTimeout(() => {
         // Simulate successful payment (90% chance)
@@ -318,10 +281,10 @@ export const fetchServiceVariations = async (serviceID: string): Promise<any[] |
   try {
     console.log(`Fetching variations for service: ${serviceID}`);
     
-    // In a real implementation, this would be a backend API call to VTPass
-    // Using the API keys securely on the server side
+    // In a real implementation, we'd make a proper API call to VTPass
+    // Since we're using live keys, we should structure this properly
     
-    // Mock data for development
+    // Mock data for development - in production this would come from the VTPass API
     const mockVariations: Record<string, any[]> = {
       'mtn-data': [
         { variation_code: 'mtn-10mb-100', name: '100 Naira - 10MB - Daily', amount: 100, validity: '1 day' },
@@ -374,6 +337,18 @@ export const fetchServiceVariations = async (serviceID: string): Promise<any[] |
       'eko-electric': [
         { variation_code: 'prepaid', name: 'Prepaid', amount: 0 },
         { variation_code: 'postpaid', name: 'Postpaid', amount: 0 },
+      ],
+      'waec': [
+        { variation_code: 'waec-registration', name: 'WAEC Registration', amount: 15000 },
+        { variation_code: 'waec-result-checker', name: 'WAEC Result Checker', amount: 1500 },
+      ],
+      'jamb': [
+        { variation_code: 'jamb-registration', name: 'JAMB Registration', amount: 4500 },
+        { variation_code: 'jamb-result-checker', name: 'JAMB Result Checker', amount: 1000 },
+      ],
+      'neco': [
+        { variation_code: 'neco-registration', name: 'NECO Registration', amount: 12500 },
+        { variation_code: 'neco-result-checker', name: 'NECO Result Checker', amount: 1000 },
       ]
     };
     
