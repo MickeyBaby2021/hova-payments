@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -59,7 +60,7 @@
   body {
     @apply bg-background text-foreground transition-colors duration-300;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background-image: url('/lovable-uploads/17066c18-4e3a-46e2-9ea1-6de868835c16.png');
+    background-image: url('/lovable-uploads/bd8f8c7a-5f53-4fa1-a12a-47f0a2f68151.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -199,4 +200,22 @@
 
 .animate-scaleIn {
   animation: scaleIn 0.5s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.5s ease-in-out;
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.5s ease-in-out;
 }

@@ -1,3 +1,4 @@
+
 import { toast } from "sonner";
 
 // Live API keys
@@ -133,6 +134,7 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
         document.body.appendChild(script);
         
         script.onload = () => {
+          // Additional delay to ensure SDK is fully loaded
           setTimeout(() => {
             try {
               if (typeof window.MonnifySDK === 'undefined') {
@@ -179,13 +181,13 @@ export const initiateMonnifyPayment = async (details: PaymentDetails): Promise<n
                   toast.error("Failed to open payment page. Please try again.");
                   reject(error);
                 }
-              }, 500);
+              }, 1000);
             } catch (error) {
               console.error("Error initializing Monnify:", error);
               toast.error("Failed to initialize payment. Please try again.");
               reject(error);
             }
-          }, 1000); // Give time for SDK to initialize
+          }, 1500); // Increased delay for SDK initialization
         };
         
         script.onerror = () => {
