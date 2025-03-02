@@ -6,6 +6,31 @@ const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-e3905beada5e69c0e68e36f86472e91c-X"
 const MONNIFY_API_KEY = "MK_TEST_XQDDR7Y8RB";
 const MONNIFY_CONTRACT_CODE = "4934121693";
 
+// Customer Verification for services
+export const verifyCustomer = async (serviceID: string, billersCode: string, type: string = "prepaid") => {
+  try {
+    console.log(`Verifying customer: ${billersCode} for service: ${serviceID}, type: ${type}`);
+    
+    // Simulate API call to verify customer
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Mock response
+    const customer = {
+      name: "John Doe",
+      address: "123 Main Street, Lagos, Nigeria",
+      accountNumber: billersCode
+    };
+    
+    return {
+      success: true,
+      customer
+    };
+  } catch (error) {
+    console.error("Error verifying customer:", error);
+    throw error;
+  }
+};
+
 export const fetchServiceVariations = async (serviceID: string) => {
   try {
     // Simulate API call to fetch service variations (data plans, cable TV packages, etc.)
@@ -75,6 +100,47 @@ export const payBill = async (payload: any) => {
     return true;
   } catch (error) {
     console.error("Error processing bill payment:", error);
+    throw error;
+  }
+};
+
+// Payment handling functions for wallet funding
+export const initiateFlutterwavePayment = async (paymentDetails: {
+  email: string;
+  amount: number;
+  name: string;
+  phone: string;
+}): Promise<number | null> => {
+  try {
+    console.log("Initiating Flutterwave payment:", paymentDetails);
+    const result = await fundWalletWithFlutterwave(paymentDetails.amount, paymentDetails.email);
+    
+    if (result) {
+      return paymentDetails.amount;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error initiating Flutterwave payment:", error);
+    throw error;
+  }
+};
+
+export const initiateMonnifyPayment = async (paymentDetails: {
+  email: string;
+  amount: number;
+  name: string;
+  phone: string;
+}): Promise<number | null> => {
+  try {
+    console.log("Initiating Monnify payment:", paymentDetails);
+    const result = await fundWalletWithMonnify(paymentDetails.amount, paymentDetails.email);
+    
+    if (result) {
+      return paymentDetails.amount;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error initiating Monnify payment:", error);
     throw error;
   }
 };
