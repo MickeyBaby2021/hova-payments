@@ -1,15 +1,16 @@
+
 import { toast } from "sonner";
 
-// API keys - these would be replaced with real production keys
-const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-e3905beada5e69c0e68e36f86472e91c-X";
-const MONNIFY_API_KEY = "MK_TEST_XQDDR7Y8RB";
+// Live API keys for production use
+const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-5d9b05395a71e81a89a7cea86a40455d-X"; // Live key for production
+const MONNIFY_API_KEY = "MK_PROD_4JQ22NQB3M"; // Live key for production
 const MONNIFY_CONTRACT_CODE = "4934121693";
 const VTPASS_API_KEY = "81bd4314130d487a9acef9638b5c4ae9";
 const VTPASS_SECRET_KEY = "SK_90b3d84f4b52e0b8ac93f3b654c62a97c06c8420786";
 const VTPASS_PUBLIC_KEY = "PK_4acee3030889d4292d173bc642603bfe6c02b988be0";
 
 // VTPass API endpoints
-const VTPASS_BASE_URL = "https://sandbox.vtpass.com/api";
+const VTPASS_BASE_URL = "https://vtpass.com/api"; // Live API endpoint (not sandbox)
 
 // Customer Verification for services
 export const verifyCustomer = async (serviceID: string, billersCode: string, type: string = "prepaid") => {
@@ -316,31 +317,35 @@ export const fundWalletWithFlutterwave = (amount: number, email: string): Promis
   return new Promise((resolve, reject) => {
     if (typeof window !== "undefined") {
       try {
-        if (typeof window.FlutterwaveCheckout === 'undefined') {
-          const script = document.createElement('script');
-          script.src = 'https://checkout.flutterwave.com/v3.js';
-          script.async = true;
-          document.body.appendChild(script);
-          
-          script.onload = () => {
-            setTimeout(() => {
-              try {
-                processFlutterwavePayment(amount, email, resolve, reject);
-              } catch (error) {
-                console.error("Error initializing Flutterwave:", error);
-                toast.error("Failed to initialize payment");
-                reject(error);
-              }
-            }, 1000);
-          };
-          
-          script.onerror = () => {
-            toast.error("Failed to load payment provider");
-            reject(new Error("Failed to load script"));
-          };
-        } else {
-          processFlutterwavePayment(amount, email, resolve, reject);
+        // Clear any existing Flutterwave scripts to avoid conflicts
+        const existingScript = document.getElementById('flutterwave-script');
+        if (existingScript) {
+          document.body.removeChild(existingScript);
         }
+        
+        // Add the script dynamically
+        const script = document.createElement('script');
+        script.id = 'flutterwave-script';
+        script.src = 'https://checkout.flutterwave.com/v3.js';
+        script.async = true;
+        document.body.appendChild(script);
+        
+        script.onload = () => {
+          setTimeout(() => {
+            try {
+              processFlutterwavePayment(amount, email, resolve, reject);
+            } catch (error) {
+              console.error("Error initializing Flutterwave:", error);
+              toast.error("Failed to initialize payment");
+              reject(error);
+            }
+          }, 1000);
+        };
+        
+        script.onerror = () => {
+          toast.error("Failed to load payment provider");
+          reject(new Error("Failed to load script"));
+        };
       } catch (error) {
         console.error("Error in fundWalletWithFlutterwave:", error);
         toast.error("Payment initialization failed");
@@ -370,6 +375,7 @@ const processFlutterwavePayment = (
       customer: {
         email,
         name: "HovaPay User",
+        phone_number: "07044040403" // Default phone number
       },
       customizations: {
         title: "HovaPay Wallet Funding",
@@ -377,6 +383,7 @@ const processFlutterwavePayment = (
         logo: "https://cdn.pixabay.com/photo/2021/09/06/01/13/wallet-6600696_1280.png",
       },
       callback: (response: any) => {
+        console.log("Payment response:", response);
         if (response.status === "successful") {
           toast.success("Wallet funded successfully!");
           resolve(true);
@@ -386,7 +393,7 @@ const processFlutterwavePayment = (
         }
       },
       onclose: () => {
-        toast.info("Payment cancelled");
+        toast.info("Payment window closed");
         resolve(false);
       },
     });

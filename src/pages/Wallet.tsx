@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -58,7 +57,7 @@ const Wallet = () => {
           email: user?.email || "user@example.com",
           amount: amountValue,
           name: user?.name || "User",
-          phone: "08012345678", // In a real app, use the user's phone
+          phone: user?.phone || "07044040403",
         });
       } else if (paymentMethod === "monnify") {
         toast.info("Initializing Monnify payment...");
@@ -66,7 +65,7 @@ const Wallet = () => {
           email: user?.email || "user@example.com",
           amount: amountValue,
           name: user?.name || "User",
-          phone: "08012345678", // In a real app, use the user's phone
+          phone: user?.phone || "07044040403",
         });
       }
       
@@ -161,7 +160,17 @@ const Wallet = () => {
                         <button
                           key={num}
                           className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-foreground py-3 rounded-xl text-xl font-medium transition-colors"
-                          onClick={() => handleNumpadClick(num.toString())}
+                          onClick={() => {
+                            if (num === 'delete') {
+                              setAmount(prev => prev.slice(0, -1));
+                            } else if (num === '.') {
+                              if (!amount.includes('.')) {
+                                setAmount(prev => prev + num);
+                              }
+                            } else {
+                              setAmount(prev => prev + num);
+                            }
+                          }}
                         >
                           {num === 'delete' ? (
                             <X className="h-6 w-6 mx-auto" />
@@ -261,7 +270,12 @@ const Wallet = () => {
                 <Button 
                   key={amt} 
                   variant="outline" 
-                  onClick={() => handleQuickFund(amt)}
+                  onClick={() => {
+                    setAmount(amt.toString());
+                    setPaymentMethod("flutterwave");
+                    setShowNumpad(true);
+                    setShowDialog(true);
+                  }}
                   className="border-dashed rounded-xl hover:border-primary hover:text-primary transition-colors"
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
