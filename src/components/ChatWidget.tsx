@@ -2,8 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Send, MessageSquare } from 'lucide-react';
+import { X, Send, MessageSquare, ExternalLink } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { toast } from "sonner";
 
 interface Message {
   id: number;
@@ -29,6 +30,7 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
+  const whatsappNumber = "07044040403";
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -46,19 +48,9 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
     
     // Simulate agent response after a delay
     setTimeout(() => {
-      const agentResponses = [
-        "Thanks for your message! Our team will get back to you soon.",
-        "I understand. How else can I assist you?",
-        "That's a great question. Let me look into that for you.",
-        "I'm here to help with any questions about your account or payments.",
-        "Would you like me to connect you with one of our customer service representatives?"
-      ];
-      
-      const randomResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
-      
       const agentMessage: Message = {
         id: messages.length + 2,
-        text: randomResponse,
+        text: "Thanks for your message! To continue this conversation, click the 'Continue on WhatsApp' button below.",
         sender: 'agent',
         timestamp: new Date()
       };
@@ -71,6 +63,19 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
     if (e.key === 'Enter') {
       handleSendMessage();
     }
+  };
+
+  const openWhatsApp = () => {
+    // Format the message with the chat history
+    const formattedMessages = messages
+      .map(msg => `${msg.sender === 'user' ? 'Me' : 'Agent'}: ${msg.text}`)
+      .join('\n');
+    
+    const whatsappMessage = encodeURIComponent(`Chat history:\n${formattedMessages}\n\nI'd like to continue our conversation.`);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    toast.success("Connecting to WhatsApp support...");
   };
 
   // Auto-scroll to the latest message
@@ -113,16 +118,27 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
         <div ref={messagesEndRef} />
       </div>
       
-      <div className={`p-3 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} flex items-center`}>
-        <Input
-          placeholder="Type your message..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyPress={handleKeyPress}
-          className="flex-grow mr-2"
-        />
-        <Button size="icon" onClick={handleSendMessage} disabled={!inputValue.trim()}>
-          <Send className="h-4 w-4" />
+      <div className={`p-3 border-t ${theme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'} flex flex-col`}>
+        <div className="flex items-center mb-2">
+          <Input
+            placeholder="Type your message..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyPress={handleKeyPress}
+            className="flex-grow mr-2"
+          />
+          <Button size="icon" onClick={handleSendMessage} disabled={!inputValue.trim()}>
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+        
+        <Button 
+          variant="outline" 
+          className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white border-0"
+          onClick={openWhatsApp}
+        >
+          <span>Continue on WhatsApp</span>
+          <ExternalLink className="h-4 w-4" />
         </Button>
       </div>
     </div>
