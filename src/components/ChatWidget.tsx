@@ -30,7 +30,7 @@ const ChatWidget = ({ isOpen, onClose }: ChatWidgetProps) => {
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
-  const whatsappNumber = "07044040403";
+  const whatsappNumber = "07044040403"; // Ensure we're using the correct number
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;

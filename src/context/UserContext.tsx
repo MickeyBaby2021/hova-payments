@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +6,7 @@ interface User {
   email: string;
   balance: number;
   avatar?: string;
+  phone?: string;
 }
 
 interface Transaction {
@@ -33,6 +33,7 @@ const defaultUser: User = {
   email: "rupak@example.com",
   balance: 0,
   avatar: "https://i.pravatar.cc/150?img=8",
+  phone: "07044040403",
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -40,7 +41,6 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(defaultUser);
   const [isLoading, setIsLoading] = useState(false);
-  // Initialize with empty array - no dummy data
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const setUser = (newUser: User) => {
@@ -55,7 +55,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       
       const newBalance = prev.balance + amount;
       
-      // Add a transaction record
       addTransaction({
         type: "credit",
         amount: amount,
@@ -86,7 +85,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const newBalance = prev.balance - amount;
       success = true;
       
-      // Add a transaction record
       addTransaction({
         type: "debit",
         amount: amount,

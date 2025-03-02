@@ -1,7 +1,6 @@
-
 import { toast } from "sonner";
 
-// API keys
+// API keys - these would be replaced with real production keys
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-e3905beada5e69c0e68e36f86472e91c-X";
 const MONNIFY_API_KEY = "MK_TEST_XQDDR7Y8RB";
 const MONNIFY_CONTRACT_CODE = "4934121693";
@@ -17,7 +16,7 @@ export const verifyCustomer = async (serviceID: string, billersCode: string, typ
   try {
     console.log(`Verifying customer: ${billersCode} for service: ${serviceID}, type: ${type}`);
     
-    // In a real app, this would call the VTPass API
+    // When connected to backend, this would call the VTPass API
     // const response = await fetch(`${VTPASS_BASE_URL}/merchant-verify`, {
     //   method: 'POST',
     //   headers: {
@@ -55,18 +54,6 @@ export const verifyCustomer = async (serviceID: string, billersCode: string, typ
 
 export const fetchServiceVariations = async (serviceID: string) => {
   try {
-    // In a real app, this would call the VTPass API
-    // const response = await fetch(`${VTPASS_BASE_URL}/service-variations?serviceID=${serviceID}`, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'api-key': VTPASS_API_KEY,
-    //     'secret-key': VTPASS_SECRET_KEY
-    //   }
-    // });
-    // const data = await response.json();
-    // return data.content.variations;
-    
     console.log(`Fetching variations for service: ${serviceID}`);
     
     // Simulate API call
@@ -126,7 +113,7 @@ export const payBill = async (payload: any) => {
   try {
     console.log("Processing bill payment:", payload);
     
-    // In a real app, this would call the VTPass API
+    // When connected to backend, this would call the VTPass API
     // const response = await fetch(`${VTPASS_BASE_URL}/pay`, {
     //   method: 'POST',
     //   headers: {

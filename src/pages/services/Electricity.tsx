@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Zap, Search, AlertCircle, Check } from "lucide-react";
+import { ArrowLeft, Zap, Search, AlertCircle, Check, X, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { verifyCustomer, payBill } from "@/services/payment";
@@ -91,7 +91,7 @@ const Electricity = () => {
         billersCode: meterNumber,
         variation_code: meterType,
         amount,
-        phone: user?.phoneNumber || "", // Use phoneNumber instead of phone
+        phone: user?.phone || "", 
         customerName: customer?.name
       };
       
