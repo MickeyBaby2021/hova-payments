@@ -1,15 +1,37 @@
 
 import { toast } from "sonner";
 
-// Live API keys
+// API keys
 const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK_TEST-e3905beada5e69c0e68e36f86472e91c-X";
 const MONNIFY_API_KEY = "MK_TEST_XQDDR7Y8RB";
 const MONNIFY_CONTRACT_CODE = "4934121693";
+const VTPASS_API_KEY = "81bd4314130d487a9acef9638b5c4ae9";
+const VTPASS_SECRET_KEY = "SK_90b3d84f4b52e0b8ac93f3b654c62a97c06c8420786";
+const VTPASS_PUBLIC_KEY = "PK_4acee3030889d4292d173bc642603bfe6c02b988be0";
+
+// VTPass API endpoints
+const VTPASS_BASE_URL = "https://sandbox.vtpass.com/api";
 
 // Customer Verification for services
 export const verifyCustomer = async (serviceID: string, billersCode: string, type: string = "prepaid") => {
   try {
     console.log(`Verifying customer: ${billersCode} for service: ${serviceID}, type: ${type}`);
+    
+    // In a real app, this would call the VTPass API
+    // const response = await fetch(`${VTPASS_BASE_URL}/merchant-verify`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'api-key': VTPASS_API_KEY,
+    //     'secret-key': VTPASS_SECRET_KEY
+    //   },
+    //   body: JSON.stringify({
+    //     serviceID,
+    //     billersCode,
+    //     type
+    //   })
+    // });
+    // const data = await response.json();
     
     // Simulate API call to verify customer
     await new Promise(resolve => setTimeout(resolve, 1500));
@@ -33,10 +55,21 @@ export const verifyCustomer = async (serviceID: string, billersCode: string, typ
 
 export const fetchServiceVariations = async (serviceID: string) => {
   try {
-    // Simulate API call to fetch service variations (data plans, cable TV packages, etc.)
+    // In a real app, this would call the VTPass API
+    // const response = await fetch(`${VTPASS_BASE_URL}/service-variations?serviceID=${serviceID}`, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'api-key': VTPASS_API_KEY,
+    //     'secret-key': VTPASS_SECRET_KEY
+    //   }
+    // });
+    // const data = await response.json();
+    // return data.content.variations;
+    
     console.log(`Fetching variations for service: ${serviceID}`);
     
-    // This would be a real API call in production
+    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Mock data
@@ -91,8 +124,23 @@ export const fetchServiceVariations = async (serviceID: string) => {
 
 export const payBill = async (payload: any) => {
   try {
-    // This would connect to a real payment API in production
     console.log("Processing bill payment:", payload);
+    
+    // In a real app, this would call the VTPass API
+    // const response = await fetch(`${VTPASS_BASE_URL}/pay`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'api-key': VTPASS_API_KEY,
+    //     'secret-key': VTPASS_SECRET_KEY
+    //   },
+    //   body: JSON.stringify({
+    //     request_id: `REQ${Date.now()}`,
+    //     ...payload
+    //   })
+    // });
+    // const data = await response.json();
+    // return data.code === "000";
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));

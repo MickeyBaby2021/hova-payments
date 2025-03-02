@@ -24,27 +24,37 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     
     // Set CSS variables based on theme
     if (theme === "dark") {
-      root.style.setProperty("--background", "#000000");
+      // Dark theme with purple accents
+      root.style.setProperty("--background", "#121212");
       root.style.setProperty("--foreground", "#ffffff");
-      root.style.setProperty("--card", "#121212");
+      root.style.setProperty("--card", "#1e1e1e");
       root.style.setProperty("--card-foreground", "#ffffff");
-      root.style.setProperty("--primary", "#1EAEDB");
+      root.style.setProperty("--primary", "#8b5cf6");
       root.style.setProperty("--primary-foreground", "#ffffff");
+      root.style.setProperty("--secondary", "#2d2d2d");
+      root.style.setProperty("--secondary-foreground", "#ffffff");
       root.style.setProperty("--muted", "#1e1e1e");
       root.style.setProperty("--muted-foreground", "#a0a0a0");
       root.style.setProperty("--border", "#333333");
       root.style.setProperty("--input", "#1e1e1e");
+      root.style.setProperty("--hover", "#9b69fd");
+      root.style.setProperty("--hover-foreground", "#ffffff");
     } else {
-      root.style.setProperty("--background", "#ffffff");
+      // Light iOS-inspired theme with purple accents
+      root.style.setProperty("--background", "#f5f5f7");
       root.style.setProperty("--foreground", "#000000");
       root.style.setProperty("--card", "#ffffff");
       root.style.setProperty("--card-foreground", "#000000");
-      root.style.setProperty("--primary", "#1EAEDB");
+      root.style.setProperty("--primary", "#8b5cf6");
       root.style.setProperty("--primary-foreground", "#ffffff");
-      root.style.setProperty("--muted", "#f5f5f5");
+      root.style.setProperty("--secondary", "#f2f2f7");
+      root.style.setProperty("--secondary-foreground", "#000000");
+      root.style.setProperty("--muted", "#f5f5f7");
       root.style.setProperty("--muted-foreground", "#6b7280");
       root.style.setProperty("--border", "#e5e5e5");
-      root.style.setProperty("--input", "#f5f5f5");
+      root.style.setProperty("--input", "#f5f5f7");
+      root.style.setProperty("--hover", "#7c4dff");
+      root.style.setProperty("--hover-foreground", "#ffffff");
     }
     
     localStorage.setItem("hovapay-theme", theme);
