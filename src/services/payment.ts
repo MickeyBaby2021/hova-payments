@@ -105,15 +105,6 @@ export const fetchServiceVariations = async (serviceID: string) => {
           { variation_code: "9mobile-data-5", name: "15GB - 30 Days", amount: 3000, validity: "30 Days" }
         );
         break;
-      case "smile-data":
-        variations.push(
-          { variation_code: "smile-data-1", name: "1GB - 30 Days", amount: 1000, validity: "30 Days" },
-          { variation_code: "smile-data-2", name: "2GB - 30 Days", amount: 2000, validity: "30 Days" },
-          { variation_code: "smile-data-3", name: "5GB - 30 Days", amount: 3500, validity: "30 Days" },
-          { variation_code: "smile-data-4", name: "10GB - 30 Days", amount: 5000, validity: "30 Days" },
-          { variation_code: "smile-data-5", name: "15GB - 30 Days", amount: 8000, validity: "30 Days" }
-        );
-        break;
     }
     
     return variations;
@@ -195,210 +186,165 @@ export const initiateMonnifyPayment = async (paymentDetails: {
   }
 };
 
-export const initiateSmilePayment = async (paymentDetails: {
-  email: string;
-  amount: number;
-  name: string;
-  phone: string;
-}): Promise<number | null> => {
-  try {
-    console.log("Initiating Smile payment:", paymentDetails);
-    // Use Paystack as the underlying payment processor for Smile
-    const result = await fundWalletWithPaystack(paymentDetails.amount, paymentDetails.email, "Smile Payment");
-    
-    if (result) {
-      toast.success("Smile payment successful!");
-      return paymentDetails.amount;
-    }
-    return null;
-  } catch (error) {
-    console.error("Error initiating Smile payment:", error);
-    throw error;
-  }
-};
-
 export const fundWalletWithMonnify = (amount: number, email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("Window is not defined"));
-      return;
-    }
-    
-    try {
-      const loadMonnifySDK = () => {
-        const existingScript = document.getElementById('monnify-script');
-        if (existingScript) {
-          // If script already exists but is faulty, remove it
-          existingScript.remove();
-        }
-        
-        const script = document.createElement('script');
-        script.id = 'monnify-script';
-        script.src = 'https://sdk.monnify.com/plugin/monnify.js';
-        script.async = true;
-        script.onload = () => {
-          console.log("Monnify script loaded successfully");
-          // Delay to ensure SDK is fully loaded
-          setTimeout(() => {
-            try {
-              initializeMonnifyPayment(amount, email, resolve, reject);
-            } catch (err) {
-              console.error("Error initializing after script load:", err);
-              reject(err);
-            }
-          }, 1000);
-        };
-        script.onerror = (error) => {
-          console.error("Error loading Monnify script:", error);
-          toast.error("Failed to load payment provider");
-          reject(new Error("Failed to load script"));
+    if (typeof window !== "undefined") {
+      try {
+        const loadMonnifySDK = () => {
+          const script = document.createElement('script');
+          script.id = 'monnify-script';
+          script.src = 'https://sdk.monnify.com/plugin/monnify.js';
+          script.async = true;
+          document.body.appendChild(script);
+          
+          script.onload = () => {
+            // Additional delay to ensure SDK is fully loaded
+            setTimeout(() => initializeMonnifyPayment(amount, email, resolve, reject), 1000);
+          };
+          
+          script.onerror = () => {
+            toast.error("Failed to load payment provider");
+            reject(new Error("Failed to load script"));
+          };
         };
         
-        document.body.appendChild(script);
-      };
-      
-      const initializeMonnifyPayment = (
-        amount: number, 
-        email: string, 
-        resolve: (value: boolean) => void, 
-        reject: (reason?: any) => void
-      ) => {
-        if (!window.MonnifySDK) {
-          console.error("MonnifySDK not available even after script load");
-          toast.error("Payment SDK failed to load");
-          reject(new Error("SDK not available"));
-          return;
-        }
-        
-        const paymentReference = `HOVAPAY_${Date.now()}`;
-        console.log("Initializing Monnify with reference:", paymentReference);
-        
-        try {
-          window.MonnifySDK.initialize({
-            amount,
-            currency: "NGN",
-            reference: paymentReference,
-            customerName: "HovaPay User",
-            customerEmail: email,
-            apiKey: MONNIFY_API_KEY,
-            contractCode: MONNIFY_CONTRACT_CODE,
-            paymentDescription: "Wallet Funding",
-            isTestMode: false, // Set to false for production
-            onComplete: (response: any) => {
-              console.log("Monnify payment complete:", response);
-              // Handle successful payment
-              if (response.status === "SUCCESS") {
-                toast.success("Wallet funded successfully!");
-                resolve(true);
-              } else {
-                toast.error("Payment was not successful");
+        const initializeMonnifyPayment = (amount: number, email: string, resolve: (value: boolean) => void, reject: (reason?: any) => void) => {
+          if (!window.MonnifySDK) {
+            toast.error("Payment SDK failed to load");
+            reject(new Error("SDK not available"));
+            return;
+          }
+          
+          const paymentReference = `HOVAPAY_${Date.now()}`;
+          
+          try {
+            window.MonnifySDK.initialize({
+              amount,
+              currency: "NGN",
+              reference: paymentReference,
+              customerName: "HovaPay User",
+              customerEmail: email,
+              apiKey: MONNIFY_API_KEY,
+              contractCode: MONNIFY_CONTRACT_CODE,
+              paymentDescription: "Wallet Funding",
+              isTestMode: false, // Set to false for production
+              onComplete: (response: any) => {
+                // Handle successful payment
+                if (response.status === "SUCCESS") {
+                  toast.success("Wallet funded successfully!");
+                  resolve(true);
+                } else {
+                  toast.error("Payment was not successful");
+                  resolve(false);
+                }
+              },
+              onClose: () => {
+                toast.info("Payment cancelled");
                 resolve(false);
               }
-            },
-            onClose: () => {
-              console.log("Monnify payment closed by user");
-              toast.info("Payment cancelled");
-              resolve(false);
-            }
-          });
-          
-          window.MonnifySDK.openIframe();
-        } catch (error) {
-          console.error("Error during Monnify initialization:", error);
-          toast.error("Failed to initialize payment");
-          reject(error);
-        }
-      };
-      
-      // Check if script already exists
-      if (document.getElementById('monnify-script')) {
-        if (window.MonnifySDK) {
-          console.log("Monnify SDK already loaded, initializing payment");
-          initializeMonnifyPayment(amount, email, resolve, reject);
+            });
+            
+            window.MonnifySDK.openIframe();
+          } catch (error) {
+            console.error("Error during Monnify initialization:", error);
+            toast.error("Failed to initialize payment");
+            reject(error);
+          }
+        };
+        
+        // Check if script already exists
+        if (document.getElementById('monnify-script')) {
+          if (window.MonnifySDK) {
+            initializeMonnifyPayment(amount, email, resolve, reject);
+          } else {
+            // Wait for script to load
+            const checkInterval = setInterval(() => {
+              if (window.MonnifySDK) {
+                clearInterval(checkInterval);
+                initializeMonnifyPayment(amount, email, resolve, reject);
+              }
+            }, 500);
+            
+            // Set timeout to prevent infinite waiting
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              if (!window.MonnifySDK) {
+                toast.error("Payment provider timed out");
+                reject(new Error("SDK load timeout"));
+              }
+            }, 10000);
+          }
         } else {
-          console.log("Script exists but SDK not initialized, reloading script");
+          // Load script
           loadMonnifySDK();
         }
-      } else {
-        // Load script
-        console.log("Loading Monnify script for the first time");
-        loadMonnifySDK();
+      } catch (error) {
+        console.error("Error in fundWalletWithMonnify:", error);
+        toast.error("Payment initialization failed");
+        reject(error);
       }
-    } catch (error) {
-      console.error("Error in fundWalletWithMonnify:", error);
-      toast.error("Payment initialization failed");
-      reject(error);
-    }
-  });
-};
-
-export const fundWalletWithPaystack = (
-  amount: number, 
-  email: string, 
-  paymentTitle: string = "Payment"
-): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
+    } else {
       reject(new Error("Window is not defined"));
-      return;
-    }
-    
-    try {
-      // Check if script already exists
-      if (document.getElementById('paystack-script')) {
-        if (window.PaystackPop) {
-          initializePaystackPayment(amount, email, paymentTitle, resolve, reject);
-        } else {
-          // Script exists but PaystackPop not loaded yet
-          const checkInterval = setInterval(() => {
-            if (window.PaystackPop) {
-              clearInterval(checkInterval);
-              initializePaystackPayment(amount, email, paymentTitle, resolve, reject);
-            }
-          }, 500);
-          
-          // Set timeout to prevent infinite waiting
-          setTimeout(() => {
-            clearInterval(checkInterval);
-            if (!window.PaystackPop) {
-              toast.error("Payment provider timed out");
-              reject(new Error("SDK load timeout"));
-            }
-          }, 10000);
-        }
-      } else {
-        // Add the script dynamically
-        const script = document.createElement('script');
-        script.id = 'paystack-script';
-        script.src = 'https://js.paystack.co/v1/inline.js';
-        script.async = true;
-        
-        script.onload = () => {
-          setTimeout(() => initializePaystackPayment(amount, email, paymentTitle, resolve, reject), 500);
-        };
-        
-        script.onerror = () => {
-          toast.error('Failed to load payment provider');
-          reject(new Error('Failed to load Paystack script'));
-        };
-        
-        document.body.appendChild(script);
-      }
-    } catch (error) {
-      console.error('Error in fundWalletWithPaystack:', error);
-      toast.error('Payment initialization failed');
-      reject(error);
     }
   });
 };
 
-function initializePaystackPayment(
-  amount: number,
-  email: string,
-  paymentTitle: string,
-  resolve: (value: boolean) => void,
-  reject: (reason?: any) => void
-) {
+export const fundWalletWithPaystack = (amount: number, email: string): Promise<boolean> => {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== "undefined") {
+      try {
+        // Check if script already exists
+        if (document.getElementById('paystack-script')) {
+          if (window.PaystackPop) {
+            initializePaystackPayment(amount, email, resolve, reject);
+          } else {
+            // Script exists but PaystackPop not loaded yet
+            const checkInterval = setInterval(() => {
+              if (window.PaystackPop) {
+                clearInterval(checkInterval);
+                initializePaystackPayment(amount, email, resolve, reject);
+              }
+            }, 500);
+            
+            // Set timeout to prevent infinite waiting
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              if (!window.PaystackPop) {
+                toast.error("Payment provider timed out");
+                reject(new Error("SDK load timeout"));
+              }
+            }, 10000);
+          }
+        } else {
+          // Add the script dynamically
+          const script = document.createElement('script');
+          script.id = 'paystack-script';
+          script.src = 'https://js.paystack.co/v1/inline.js';
+          script.async = true;
+          
+          script.onload = () => {
+            setTimeout(() => initializePaystackPayment(amount, email, resolve, reject), 500);
+          };
+          
+          script.onerror = () => {
+            toast.error('Failed to load payment provider');
+            reject(new Error('Failed to load Paystack script'));
+          };
+          
+          document.body.appendChild(script);
+        }
+      } catch (error) {
+        console.error('Error in fundWalletWithPaystack:', error);
+        toast.error('Payment initialization failed');
+        reject(error);
+      }
+    } else {
+      reject(new Error('Window is not defined'));
+    }
+  });
+};
+
+function initializePaystackPayment(amount: number, email: string, resolve: (value: boolean) => void, reject: (reason?: any) => void) {
   try {
     if (!window.PaystackPop) {
       toast.error("Payment provider failed to load");
@@ -415,7 +361,7 @@ function initializePaystackPayment(
       callback: function(response: any) {
         console.log('Paystack response:', response);
         if (response.status === 'success') {
-          toast.success(`${paymentTitle} successful!`);
+          toast.success('Payment successful!');
           resolve(true);
         } else {
           toast.error('Payment failed');
