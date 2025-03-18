@@ -6,280 +6,110 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+    --foreground: 222.2 84% 4.9%;
+
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 265 74% 60%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --hover: 225 73% 57%;
+    --hover-foreground: 210 40% 98%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 265 74% 60%;
-    --radius: 1rem;
-    --hover: 265 74% 55%;
-    --hover-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+ 
+    --radius: 0.5rem;
   }
  
   .dark {
-    --background: 0 0% 7%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 265 74% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 17%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 70%;
-    --accent: 0 0% 17%;
-    --accent-foreground: 0 0% 100%;
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --hover: 221 83% 53%;
+    --hover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+ 
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+ 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 265 74% 60%;
-    --hover: 265 74% 50%;
-    --hover-foreground: 0 0% 100%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background-image: url('/lovable-uploads/bd8f8c7a-5f53-4fa1-a12a-47f0a2f68151.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-  }
-  
-  .dark body {
-    background-image: none;
-    background-color: #000000;
   }
 }
 
-.glass-card {
-  @apply backdrop-blur-md bg-white/80 dark:bg-black/30 border border-white/40 dark:border-white/10 shadow-md rounded-2xl;
-}
+@layer components {
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
 
-.purple-card {
-  @apply bg-gradient-to-br from-purple-500 to-purple-700 text-white rounded-2xl shadow-xl;
-}
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 
-.light-purple-card {
-  @apply bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-2xl shadow-md;
-}
+  .hover-effect {
+    @apply transition-all duration-300 border border-gray-100 dark:border-gray-800 hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md;
+  }
 
-.blue-gradient-card {
-  @apply bg-gradient-to-br from-blue-700 to-indigo-900 text-white rounded-2xl shadow-md;
-}
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border border-gray-100 dark:border-gray-800 rounded-xl p-4 hover:border-blue-200 dark:hover:border-blue-800;
+  }
 
-.pink-card {
-  @apply bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white rounded-2xl shadow-md;
-}
+  .ios-card {
+    @apply bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm;
+  }
 
-/* iOS UI inspired cards */
-.ios-card {
-  @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden;
-}
+  .activity-item {
+    @apply flex justify-between items-center p-3 rounded-xl;
+  }
 
-.ios-primary-card {
-  @apply bg-gradient-to-br from-blue-700 to-indigo-800 text-white rounded-2xl shadow-md;
-}
-
-.ios-secondary-card {
-  @apply bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-2xl shadow-md;
-}
-
-.ios-accent-card {
-  @apply bg-gradient-to-br from-pink-500 to-rose-500 text-white rounded-2xl shadow-md;
-}
-
-.ios-success-card {
-  @apply bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-2xl shadow-md;
-}
-
-.ios-warning-card {
-  @apply bg-gradient-to-br from-amber-500 to-yellow-500 text-white rounded-2xl shadow-md;
-}
-
-.hover-effect {
-  @apply transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-lg;
-}
-
-.service-icon {
-  @apply w-12 h-12 text-primary;
-}
-
-.fade-in {
-  @apply animate-fadeIn;
-}
-
-.slide-up {
-  @apply animate-slideUp;
-}
-
-.numpad-btn {
-  @apply w-full h-16 rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-xl font-semibold flex items-center justify-center transition;
-}
-
-.payment-method-card {
-  @apply p-4 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-3 cursor-pointer transition-all hover:border-primary hover:shadow-md;
-}
-
-.balance-display {
-  @apply text-3xl md:text-4xl font-bold;
-}
-
-.nav-item {
-  @apply flex flex-col items-center justify-center p-2 rounded-lg transition-colors hover:bg-gray-100 dark:hover:bg-gray-800;
-}
-
-.nav-item.active {
-  @apply text-primary;
-}
-
-.activity-item {
-  @apply flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg;
-}
-
-/* Notification Styles */
-.notification-dot {
-  @apply absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full;
-}
-
-.notification-badge {
-  @apply absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 text-xs bg-red-500 text-white rounded-full;
-}
-
-.notification-item {
-  @apply p-3 border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors;
-}
-
-.notification-item-unread {
-  @apply bg-blue-50 dark:bg-blue-900/20;
-}
-
-/* Text gradients */
-.text-gradient-blue {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800;
-}
-
-.text-gradient-purple {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600;
-}
-
-/* Chat Widget Styles */
-.chat-widget {
-  @apply fixed bottom-20 right-4 z-50 w-72 md:w-80 shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800;
-}
-
-.chat-widget-header {
-  @apply bg-gradient-to-r from-blue-700 to-indigo-800 p-3 text-white font-medium flex items-center justify-between;
-}
-
-.chat-widget-content {
-  @apply h-80 overflow-y-auto p-4;
-}
-
-.chat-widget-input {
-  @apply p-3 border-t border-gray-200 dark:border-gray-800 flex;
-}
-
-.chat-bubble {
-  @apply max-w-[85%] p-3 rounded-xl mb-2;
-}
-
-.chat-bubble-user {
-  @apply bg-blue-600 text-white ml-auto rounded-br-none;
-}
-
-.chat-bubble-agent {
-  @apply bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 mr-auto rounded-bl-none;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-.animate-slideUp {
-  animation: slideUp 0.5s ease-in-out;
-}
-
-.animate-scaleIn {
-  animation: scaleIn 0.5s ease-in-out;
-}
-
-@keyframes slideInRight {
-  from { transform: translateX(100px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideInUp {
-  from { transform: translateY(100px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.animate-slideInRight {
-  animation: slideInRight 0.5s ease-in-out;
-}
-
-.animate-slideInUp {
-  animation: slideInUp 0.5s ease-in-out;
-}
-
-/* iOS-style buttons */
-.ios-button {
-  @apply rounded-full bg-blue-700 text-white py-3 px-6 font-medium text-sm transition-all 
-         hover:bg-blue-800 active:transform active:scale-95 shadow-sm;
-}
-
-.ios-button-secondary {
-  @apply rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white py-3 px-6 font-medium text-sm
-         transition-all hover:bg-gray-300 dark:hover:bg-gray-600 active:transform active:scale-95;
-}
-
-.ios-input {
-  @apply bg-gray-100 dark:bg-gray-800 border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-700 transition-all;
-}
-
-/* Added classes for button gradients */
-.btn-gradient-blue {
-  @apply bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white;
-}
-
-.btn-gradient-purple {
-  @apply bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white;
+  .light-purple-card {
+    @apply bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-100 dark:border-blue-800/30;
+  }
 }

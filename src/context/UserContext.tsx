@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -26,6 +27,8 @@ interface UserContextType {
   deductFromBalance: (amount: number) => boolean;
   transactions: Transaction[];
   addTransaction: (transaction: Omit<Transaction, "id" | "date">) => void;
+  resetBalance: () => void;
+  clearTransactions: () => void;
 }
 
 const defaultUser: User = {
@@ -117,6 +120,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const resetBalance = () => {
+    setUserState(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        balance: 0
+      };
+    });
+  };
+
+  const clearTransactions = () => {
+    setTransactions([]);
+  };
+
   return (
     <UserContext.Provider value={{ 
       user, 
@@ -125,7 +142,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       addToBalance, 
       deductFromBalance,
       transactions,
-      addTransaction
+      addTransaction,
+      resetBalance,
+      clearTransactions
     }}>
       {children}
     </UserContext.Provider>

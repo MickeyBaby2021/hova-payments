@@ -11,7 +11,8 @@ import {
   X, 
   ChevronLeft,
   AlertCircle,
-  Clock
+  Clock,
+  Check
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,18 +24,21 @@ import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
   const navigate = useNavigate();
-  const { user, addToBalance, transactions } = useUser();
+  const { user, addToBalance, transactions, resetBalance } = useUser();
   const [amount, setAmount] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("paystack");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNumpad, setShowNumpad] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [showPaymentSelection, setShowPaymentSelection] = useState<boolean>(true);
 
   // Clear error message when closing dialog
   useEffect(() => {
     if (!showDialog) {
       setPaymentError(null);
+      setShowPaymentSelection(true);
+      setShowNumpad(false);
     }
   }, [showDialog]);
 
@@ -71,6 +75,8 @@ const Wallet = () => {
       }
       
       if (result) {
+        // Reset balance before adding new amount
+        resetBalance();
         addToBalance(result);
         setAmount("");
         setShowNumpad(false);
@@ -106,8 +112,8 @@ const Wallet = () => {
 
   const handleQuickFund = (amt: number) => {
     setAmount(amt.toString());
-    setPaymentMethod("paystack");
-    setShowNumpad(true);
+    setShowPaymentSelection(true);
+    setShowNumpad(false);
     setShowDialog(true);
   };
 
@@ -115,6 +121,16 @@ const Wallet = () => {
   const recentFunding = transactions
     .filter(tx => tx.type === "credit" && tx.status === "success")
     .slice(0, 3);
+  
+  const handleContinueToNumpad = () => {
+    setShowPaymentSelection(false);
+    setShowNumpad(true);
+  };
+
+  const handleBackToPaymentSelection = () => {
+    setShowPaymentSelection(true);
+    setShowNumpad(false);
+  };
   
   return (
     <DashboardLayout>
@@ -137,73 +153,45 @@ const Wallet = () => {
                   </div>
                 )}
                 
-                {showNumpad ? (
-                  <div className="space-y-6">
-                    <div className="relative">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="absolute left-0 top-3 rounded-full"
-                        onClick={() => setShowNumpad(false)}
-                      >
-                        <ChevronLeft className="h-5 w-5" />
-                      </Button>
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Enter Amount</p>
-                        <div className="text-3xl font-bold my-2 bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">
-                          ₦{amount || "0"}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-4">
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 0, 'delete'].map((num) => (
-                        <button
-                          key={num}
-                          className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-foreground py-3 rounded-xl text-xl font-medium transition-colors"
-                          onClick={() => {
-                            if (num === 'delete') {
-                              setAmount(prev => prev.slice(0, -1));
-                            } else if (num === '.') {
-                              if (!amount.includes('.')) {
-                                setAmount(prev => prev + num);
-                              }
-                            } else {
-                              setAmount(prev => prev + num);
-                            }
-                          }}
-                        >
-                          {num === 'delete' ? (
-                            <X className="h-6 w-6 mx-auto" />
-                          ) : (
-                            num
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                    
-                    <div className="text-sm text-muted-foreground text-center mb-2">
-                      Payment method: <span className="font-medium capitalize">{paymentMethod}</span>
-                    </div>
-                    
-                    <Button 
-                      className="w-full h-14 text-lg rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" 
-                      onClick={handlePayment}
-                      disabled={isLoading || !amount || parseFloat(amount) <= 0}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      ) : null}
-                      Fund Wallet
-                    </Button>
-                  </div>
-                ) : (
+                {showPaymentSelection && !showNumpad && (
                   <div className="space-y-4">
                     <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-4 rounded-xl text-center text-white">
                       <p className="text-sm text-white/80">Available Balance</p>
                       <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
                     </div>
                     
+                    <div className="text-center mb-4">
+                      <p className="text-sm text-muted-foreground">Enter Amount</p>
+                      <input
+                        type="text"
+                        value={amount}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (/^\d*\.?\d*$/.test(value)) {
+                            setAmount(value);
+                          }
+                        }}
+                        className="text-3xl font-bold my-2 bg-transparent text-center w-full bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent focus:outline-none"
+                        placeholder="0"
+                      />
+                    </div>
+                    
+                    <p className="text-sm font-medium text-center mb-1">Quick Amounts</p>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {[1000, 5000, 10000, 20000].map((amt) => (
+                        <Button 
+                          key={amt} 
+                          variant="outline" 
+                          onClick={() => setAmount(amt.toString())}
+                          className="border-dashed rounded-xl hover:border-primary hover:text-primary transition-colors"
+                        >
+                          <PlusCircle className="h-4 w-4 mr-2" />
+                          ₦{amt.toLocaleString()}
+                        </Button>
+                      ))}
+                    </div>
+                    
+                    <p className="text-sm font-medium text-center mb-1">Choose Payment Method</p>
                     <RadioGroup
                       defaultValue={paymentMethod}
                       onValueChange={setPaymentMethod}
@@ -237,10 +225,66 @@ const Wallet = () => {
                     </RadioGroup>
                     
                     <div className="flex justify-center">
-                      <Button size="lg" className="w-full rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" onClick={() => setShowNumpad(true)}>
-                        Continue
+                      <Button 
+                        size="lg" 
+                        className="w-full rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" 
+                        onClick={handleContinueToNumpad}
+                        disabled={!amount || parseFloat(amount) <= 0}
+                      >
+                        Continue to Payment
                       </Button>
                     </div>
+                  </div>
+                )}
+                
+                {showNumpad && (
+                  <div className="space-y-6">
+                    <div className="relative">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="absolute left-0 top-3 rounded-full"
+                        onClick={handleBackToPaymentSelection}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                      <div className="text-center">
+                        <p className="text-sm text-muted-foreground">Amount to Fund</p>
+                        <div className="text-3xl font-bold my-2 bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">
+                          ₦{amount || "0"}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm text-center text-muted-foreground">
+                      <p className="font-medium">Payment Summary</p>
+                      <div className="flex justify-between items-center border-b py-2 mx-8">
+                        <span>Amount:</span>
+                        <span className="font-medium">₦{parseFloat(amount).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b py-2 mx-8">
+                        <span>Payment Method:</span>
+                        <span className="font-medium capitalize">{paymentMethod}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl flex items-start gap-2">
+                      <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-blue-600 dark:text-blue-400">
+                        Your wallet will be funded after successful payment. You'll be redirected back to the app automatically.
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      className="w-full h-14 text-lg rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" 
+                      onClick={handlePayment}
+                      disabled={isLoading || !amount || parseFloat(amount) <= 0}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      ) : null}
+                      Pay ₦{parseFloat(amount || "0").toLocaleString()}
+                    </Button>
                   </div>
                 )}
               </div>
@@ -271,12 +315,7 @@ const Wallet = () => {
                 <Button 
                   key={amt} 
                   variant="outline" 
-                  onClick={() => {
-                    setAmount(amt.toString());
-                    setPaymentMethod("paystack");
-                    setShowNumpad(true);
-                    setShowDialog(true);
-                  }}
+                  onClick={() => handleQuickFund(amt)}
                   className="border-dashed rounded-xl hover:border-primary hover:text-primary transition-colors"
                 >
                   <PlusCircle className="h-4 w-4 mr-2" />
