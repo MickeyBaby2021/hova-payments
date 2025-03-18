@@ -1,31 +1,40 @@
 
-interface Window {
-  FlutterwaveCheckout?: (config: any) => void;
-  MonnifySDK?: {
-    initialize: (config: any) => void;
+interface MonnifyInstance {
+  initialize: (config: MonnifyConfig) => void;
+  openIframe: () => void;
+}
+
+interface MonnifyConfig {
+  amount: number;
+  currency: string;
+  reference: string;
+  customerName: string;
+  customerEmail: string;
+  apiKey: string;
+  contractCode: string;
+  paymentDescription: string;
+  isTestMode: boolean;
+  onComplete: (response: any) => void;
+  onClose: () => void;
+}
+
+interface PaystackInstance {
+  setup: (config: PaystackConfig) => {
     openIframe: () => void;
   };
-  PaystackPop?: {
-    setup: (config: any) => {
-      openIframe: () => void;
-    };
-  };
 }
 
-interface VTPassService {
-  id: string;
-  serviceID: string;
-  name: string;
-  icon: React.ElementType;
-  colorClass: string;
-  variations?: any[];
-  description?: string;
-}
-
-interface ServiceVariation {
-  variation_code: string;
-  name: string;
+interface PaystackConfig {
+  key: string;
+  email: string;
   amount: number;
-  validity?: string;
-  description?: string;
+  currency: string;
+  ref: string;
+  callback: (response: any) => void;
+  onClose: () => void;
+}
+
+interface Window {
+  PaystackPop?: PaystackInstance;
+  MonnifySDK?: MonnifyInstance;
 }

@@ -14,13 +14,18 @@ import {
   Clock,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  Smile
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
-import { initiatePaystackPayment, initiateMonnifyPayment } from "@/services/payment";
+import { 
+  initiatePaystackPayment, 
+  initiateMonnifyPayment, 
+  initiateSmilePayment 
+} from "@/services/payment";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -74,11 +79,18 @@ const Wallet = () => {
           name: user?.name || "User",
           phone: user?.phone || "07044040403",
         });
+      } else if (paymentMethod === "smile") {
+        toast.info("Initializing Smile payment...");
+        result = await initiateSmilePayment({
+          email: user?.email || "user@example.com",
+          amount: amountValue,
+          name: user?.name || "User",
+          phone: user?.phone || "07044040403",
+        });
       }
       
       if (result) {
-        // Reset balance before adding new amount
-        resetBalance();
+        // Add to balance (not reset)
         addToBalance(result);
         setAmount("");
         setShowNumpad(false);
@@ -143,7 +155,7 @@ const Wallet = () => {
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-hover rounded-full">Fund Wallet</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-xl bg-background">
+            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-xl bg-white dark:bg-gray-900">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold text-center bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">Fund Wallet</DialogTitle>
               </DialogHeader>
@@ -236,6 +248,19 @@ const Wallet = () => {
                           <div>
                             <p className="font-medium">Monnify</p>
                             <p className="text-xs text-muted-foreground">Quick bank transfers and card payments</p>
+                          </div>
+                        </Label>
+                      </div>
+
+                      <div className="border rounded-xl p-4 flex items-center space-x-3 hover:border-primary transition-colors">
+                        <RadioGroupItem value="smile" id="smile" />
+                        <Label htmlFor="smile" className="flex items-center space-x-3 cursor-pointer flex-1">
+                          <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-full">
+                            <Smile className="h-5 w-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Smile</p>
+                            <p className="text-xs text-muted-foreground">VTPass Smile payment integration</p>
                           </div>
                         </Label>
                       </div>

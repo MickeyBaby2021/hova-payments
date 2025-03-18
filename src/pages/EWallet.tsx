@@ -47,7 +47,7 @@ const EWallet = () => {
           <h1 className="text-2xl font-bold">E-Wallet</h1>
         </div>
 
-        <Card className="p-6 light-purple-card relative">
+        <Card className="p-6 bg-gradient-to-r from-blue-700 to-indigo-800 text-white relative">
           <div className="flex items-center space-x-4 mb-4">
             <CreditCard className="h-8 w-8" />
             <div>
@@ -62,13 +62,13 @@ const EWallet = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10 absolute right-3 top-3"
+              className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 absolute right-3 top-3"
               onClick={toggleBalanceVisibility}
             >
               {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </Button>
           </div>
-          <Button onClick={() => navigate("/wallet")} className="w-full">
+          <Button onClick={() => navigate("/wallet")} className="w-full bg-white/20 hover:bg-white/30 text-white">
             Fund Wallet
           </Button>
         </Card>

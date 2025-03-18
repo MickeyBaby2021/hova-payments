@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { toast } from "sonner";
+import { useNotifications } from "./NotificationContext";
 
 interface User {
   name: string;
@@ -49,6 +50,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showBalance, setShowBalance] = useState<boolean>(true);
+  const { addNotification } = useNotifications();
 
   const setUser = (newUser: User) => {
     setUserState(newUser);
@@ -71,6 +73,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         amount: amount,
         description: "Wallet funding",
         status: "success"
+      });
+      
+      // Add notification
+      addNotification({
+        title: "Wallet Funded",
+        message: `₦${amount.toLocaleString()} has been added to your wallet`,
+        type: 'transaction'
       });
       
       return {
@@ -101,6 +110,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         amount: amount,
         description: "Payment",
         status: "success"
+      });
+      
+      // Add notification
+      addNotification({
+        title: "Payment Made",
+        message: `₦${amount.toLocaleString()} has been deducted from your wallet`,
+        type: 'transaction'
       });
       
       return {
