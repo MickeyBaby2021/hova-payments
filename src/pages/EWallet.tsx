@@ -9,7 +9,9 @@ import {
   Copy, 
   Clock, 
   CheckCircle2,
-  ShieldCheck
+  ShieldCheck,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@/context/UserContext";
@@ -18,7 +20,7 @@ import { toast } from "sonner";
 
 const EWallet = () => {
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, showBalance, toggleBalanceVisibility } = useUser();
   const [virtualAccountDetails] = useState({
     accountNumber: "9102045738",
     accountName: user?.name,
@@ -45,13 +47,26 @@ const EWallet = () => {
           <h1 className="text-2xl font-bold">E-Wallet</h1>
         </div>
 
-        <Card className="p-6 light-purple-card">
+        <Card className="p-6 light-purple-card relative">
           <div className="flex items-center space-x-4 mb-4">
             <CreditCard className="h-8 w-8" />
             <div>
               <p className="text-sm text-card-foreground/80">Wallet Balance</p>
-              <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
+              <p className="text-3xl font-bold">
+                {showBalance 
+                  ? `₦${user?.balance.toLocaleString()}`
+                  : "₦•••••••"
+                }
+              </p>
             </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-primary/70 hover:text-primary hover:bg-primary/10 absolute right-3 top-3"
+              onClick={toggleBalanceVisibility}
+            >
+              {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
           </div>
           <Button onClick={() => navigate("/wallet")} className="w-full">
             Fund Wallet

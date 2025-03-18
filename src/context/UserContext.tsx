@@ -29,6 +29,9 @@ interface UserContextType {
   addTransaction: (transaction: Omit<Transaction, "id" | "date">) => void;
   resetBalance: () => void;
   clearTransactions: () => void;
+  showBalance: boolean;
+  toggleBalanceVisibility: () => void;
+  logout: () => void;
 }
 
 const defaultUser: User = {
@@ -45,9 +48,14 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUserState] = useState<User | null>(defaultUser);
   const [isLoading, setIsLoading] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [showBalance, setShowBalance] = useState<boolean>(true);
 
   const setUser = (newUser: User) => {
     setUserState(newUser);
+  };
+
+  const toggleBalanceVisibility = () => {
+    setShowBalance(prev => !prev);
   };
 
   const addToBalance = (amount: number) => {
@@ -134,6 +142,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setTransactions([]);
   };
 
+  const logout = () => {
+    setUserState(defaultUser);
+    clearTransactions();
+    resetBalance();
+    toast.info("Logged out successfully");
+  };
+
   return (
     <UserContext.Provider value={{ 
       user, 
@@ -144,7 +159,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       transactions,
       addTransaction,
       resetBalance,
-      clearTransactions
+      clearTransactions,
+      showBalance,
+      toggleBalanceVisibility,
+      logout
     }}>
       {children}
     </UserContext.Provider>

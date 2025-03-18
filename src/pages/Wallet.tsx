@@ -12,7 +12,9 @@ import {
   ChevronLeft,
   AlertCircle,
   Clock,
-  Check
+  Check,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -24,7 +26,7 @@ import { useNavigate } from "react-router-dom";
 
 const Wallet = () => {
   const navigate = useNavigate();
-  const { user, addToBalance, transactions, resetBalance } = useUser();
+  const { user, addToBalance, transactions, resetBalance, showBalance, toggleBalanceVisibility } = useUser();
   const [amount, setAmount] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("paystack");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -141,7 +143,7 @@ const Wallet = () => {
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-hover rounded-full">Fund Wallet</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-xl">
+            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-xl bg-background">
               <DialogHeader>
                 <DialogTitle className="text-xl font-bold text-center bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">Fund Wallet</DialogTitle>
               </DialogHeader>
@@ -155,9 +157,24 @@ const Wallet = () => {
                 
                 {showPaymentSelection && !showNumpad && (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-4 rounded-xl text-center text-white">
+                    <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-4 rounded-xl text-center text-white relative">
                       <p className="text-sm text-white/80">Available Balance</p>
-                      <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
+                      <div className="flex justify-center items-center gap-2">
+                        <p className="text-3xl font-bold">
+                          {showBalance 
+                            ? `₦${user?.balance.toLocaleString()}`
+                            : "₦•••••••"
+                          }
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10 absolute right-2 top-2"
+                          onClick={toggleBalanceVisibility}
+                        >
+                          {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
                     </div>
                     
                     <div className="text-center mb-4">
@@ -293,14 +310,27 @@ const Wallet = () => {
         </div>
 
         {/* Balance Card */}
-        <Card className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white rounded-2xl shadow-xl">
+        <Card className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white rounded-2xl shadow-xl relative">
           <div className="flex items-center space-x-4 mb-4">
             <WalletIcon className="h-8 w-8" />
             <div>
               <p className="text-sm text-gray-100">Wallet Balance</p>
-              <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
+              <p className="text-3xl font-bold">
+                {showBalance 
+                  ? `₦${user?.balance.toLocaleString()}`
+                  : "₦•••••••"
+                }
+              </p>
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10 absolute right-3 top-3"
+            onClick={toggleBalanceVisibility}
+          >
+            {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </Button>
         </Card>
 
         {/* Quick Fund Options */}

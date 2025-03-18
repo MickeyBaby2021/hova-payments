@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 
@@ -31,7 +31,7 @@ const Login = () => {
         const mockUser = {
           name: "Rupak Chakraborty",
           email,
-          balance: 25000,
+          balance: 0,
           avatar: "https://i.pravatar.cc/150?img=8",
           phone: "07044040403"
         };
@@ -51,7 +51,7 @@ const Login = () => {
       
       <div className="w-full max-w-md z-10">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">HOVAPAY</h1>
+          <h1 className="text-5xl font-bold text-white mb-2 tracking-tight">HOVAPAY</h1>
           <p className="text-blue-100">Your financial freedom starts here</p>
         </div>
         
@@ -89,7 +89,7 @@ const Login = () => {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-2 text-white/70 hover:text-white"
+                  className="absolute right-2 top-2 text-white/70 hover:text-white hover:bg-white/10"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -107,7 +107,14 @@ const Login = () => {
               disabled={isLoading}
               className="w-full h-11 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
           

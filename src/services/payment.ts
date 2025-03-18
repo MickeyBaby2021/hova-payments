@@ -190,122 +190,93 @@ export const fundWalletWithMonnify = (amount: number, email: string): Promise<bo
   return new Promise((resolve, reject) => {
     if (typeof window !== "undefined") {
       try {
-        if (typeof window.MonnifySDK === 'undefined') {
-          // Check if script is already being loaded
-          const existingScript = document.getElementById('monnify-script');
-          if (!existingScript) {
-            const script = document.createElement('script');
-            script.id = 'monnify-script';
-            script.src = 'https://sdk.monnify.com/plugin/monnify.js';
-            script.async = true;
-            document.body.appendChild(script);
-            
-            script.onload = () => {
-              // Additional delay to ensure SDK is fully loaded
-              setTimeout(() => {
-                try {
-                  if (typeof window.MonnifySDK === 'undefined') {
-                    toast.error("Payment SDK failed to load");
-                    reject(new Error("SDK failed to load"));
-                    return;
-                  }
-                  
-                  const paymentReference = `HOVAPAY_${Date.now()}`;
-                  
-                  // Initialize and open payment modal
-                  setTimeout(() => {
-                    try {
-                      window.MonnifySDK.initialize({
-                        amount,
-                        currency: "NGN",
-                        reference: paymentReference,
-                        customerName: "HovaPay User",
-                        customerEmail: email,
-                        apiKey: MONNIFY_API_KEY,
-                        contractCode: MONNIFY_CONTRACT_CODE,
-                        paymentDescription: "Wallet Funding",
-                        isTestMode: false, // Changed to false for live mode
-                        onComplete: (response: any) => {
-                          // Handle successful payment
-                          if (response.status === "SUCCESS") {
-                            toast.success("Wallet funded successfully!");
-                            resolve(true);
-                          } else {
-                            toast.error("Payment was not successful");
-                            resolve(false);
-                          }
-                        },
-                        onClose: () => {
-                          toast.info("Payment cancelled");
-                          resolve(false);
-                        }
-                      });
-                    } catch (error) {
-                      console.error("Error during Monnify initialization:", error);
-                      toast.error("Failed to open payment page. Please try again.");
-                      reject(error);
-                    }
-                  }, 1000);
-                } catch (error) {
-                  console.error("Error initializing Monnify:", error);
-                  toast.error("Failed to initialize payment. Please try again.");
-                  reject(error);
+        const loadMonnifySDK = () => {
+          const script = document.createElement('script');
+          script.id = 'monnify-script';
+          script.src = 'https://sdk.monnify.com/plugin/monnify.js';
+          script.async = true;
+          document.body.appendChild(script);
+          
+          script.onload = () => {
+            // Additional delay to ensure SDK is fully loaded
+            setTimeout(() => initializeMonnifyPayment(amount, email, resolve, reject), 1000);
+          };
+          
+          script.onerror = () => {
+            toast.error("Failed to load payment provider");
+            reject(new Error("Failed to load script"));
+          };
+        };
+        
+        const initializeMonnifyPayment = (amount: number, email: string, resolve: (value: boolean) => void, reject: (reason?: any) => void) => {
+          if (!window.MonnifySDK) {
+            toast.error("Payment SDK failed to load");
+            reject(new Error("SDK not available"));
+            return;
+          }
+          
+          const paymentReference = `HOVAPAY_${Date.now()}`;
+          
+          try {
+            window.MonnifySDK.initialize({
+              amount,
+              currency: "NGN",
+              reference: paymentReference,
+              customerName: "HovaPay User",
+              customerEmail: email,
+              apiKey: MONNIFY_API_KEY,
+              contractCode: MONNIFY_CONTRACT_CODE,
+              paymentDescription: "Wallet Funding",
+              isTestMode: false, // Set to false for production
+              onComplete: (response: any) => {
+                // Handle successful payment
+                if (response.status === "SUCCESS") {
+                  toast.success("Wallet funded successfully!");
+                  resolve(true);
+                } else {
+                  toast.error("Payment was not successful");
+                  resolve(false);
                 }
-              }, 1500); // Increased delay for SDK initialization
-            };
+              },
+              onClose: () => {
+                toast.info("Payment cancelled");
+                resolve(false);
+              }
+            });
             
-            script.onerror = () => {
-              toast.error("Failed to load payment provider");
-              reject(new Error("Failed to load script"));
-            };
+            window.MonnifySDK.openIframe();
+          } catch (error) {
+            console.error("Error during Monnify initialization:", error);
+            toast.error("Failed to initialize payment");
+            reject(error);
+          }
+        };
+        
+        // Check if script already exists
+        if (document.getElementById('monnify-script')) {
+          if (window.MonnifySDK) {
+            initializeMonnifyPayment(amount, email, resolve, reject);
           } else {
-            // Script is already loading, wait for it
-            const checkSDKInterval = setInterval(() => {
-              if (typeof window.MonnifySDK !== 'undefined') {
-                clearInterval(checkSDKInterval);
-                fundWalletWithMonnify(amount, email)
-                  .then(resolve)
-                  .catch(reject);
+            // Wait for script to load
+            const checkInterval = setInterval(() => {
+              if (window.MonnifySDK) {
+                clearInterval(checkInterval);
+                initializeMonnifyPayment(amount, email, resolve, reject);
               }
             }, 500);
             
-            // Set a timeout to stop checking after 10 seconds
+            // Set timeout to prevent infinite waiting
             setTimeout(() => {
-              clearInterval(checkSDKInterval);
-              if (typeof window.MonnifySDK === 'undefined') {
-                toast.error("Payment system timed out");
+              clearInterval(checkInterval);
+              if (!window.MonnifySDK) {
+                toast.error("Payment provider timed out");
                 reject(new Error("SDK load timeout"));
               }
             }, 10000);
           }
         } else {
-          // SDK already loaded, initialize payment directly
-          const paymentReference = `HOVAPAY_${Date.now()}`;
-          
-          window.MonnifySDK.initialize({
-            amount,
-            currency: "NGN",
-            reference: paymentReference,
-            customerName: "HovaPay User",
-            customerEmail: email,
-            apiKey: MONNIFY_API_KEY,
-            contractCode: MONNIFY_CONTRACT_CODE,
-            paymentDescription: "Wallet Funding",
-            isTestMode: false, // Changed to false for live mode
-            onComplete: (response: any) => {
-              if (response.status === "SUCCESS") {
-                toast.success("Wallet funded successfully!");
-                resolve(true);
-              } else {
-                toast.error("Payment was not successful");
-                resolve(false);
-              }
-            },
-            onClose: () => {
-              toast.info("Payment cancelled");
-              resolve(false);
-            }
-          });
+          // Load script
+          loadMonnifySDK();
         }
       } catch (error) {
         console.error("Error in fundWalletWithMonnify:", error);
@@ -322,54 +293,46 @@ export const fundWalletWithPaystack = (amount: number, email: string): Promise<b
   return new Promise((resolve, reject) => {
     if (typeof window !== "undefined") {
       try {
-        // Add the script dynamically
-        const script = document.createElement('script');
-        script.src = 'https://js.paystack.co/v1/inline.js';
-        script.async = true;
-        
-        script.onload = () => {
-          try {
-            if (!window.PaystackPop) {
-              toast.error("Payment provider failed to load");
-              reject(new Error("PaystackPop not available"));
-              return;
-            }
-            
-            const handler = window.PaystackPop.setup({
-              key: PAYSTACK_PUBLIC_KEY,
-              email: email,
-              amount: amount * 100, // Paystack uses amount in kobo (multiply by 100)
-              currency: 'NGN',
-              ref: `HOVAPAY_PS_${Date.now()}`,
-              callback: function(response: any) {
-                console.log('Paystack response:', response);
-                if (response.status === 'success') {
-                  toast.success('Payment successful!');
-                  resolve(true);
-                } else {
-                  toast.error('Payment failed');
-                  resolve(false);
-                }
-              },
-              onClose: function() {
-                toast.info('Payment window closed');
-                resolve(false);
+        // Check if script already exists
+        if (document.getElementById('paystack-script')) {
+          if (window.PaystackPop) {
+            initializePaystackPayment(amount, email, resolve, reject);
+          } else {
+            // Script exists but PaystackPop not loaded yet
+            const checkInterval = setInterval(() => {
+              if (window.PaystackPop) {
+                clearInterval(checkInterval);
+                initializePaystackPayment(amount, email, resolve, reject);
               }
-            });
-            handler.openIframe();
-          } catch (error) {
-            console.error('Error initializing Paystack:', error);
-            toast.error('Failed to initialize payment');
-            reject(error);
+            }, 500);
+            
+            // Set timeout to prevent infinite waiting
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              if (!window.PaystackPop) {
+                toast.error("Payment provider timed out");
+                reject(new Error("SDK load timeout"));
+              }
+            }, 10000);
           }
-        };
-        
-        script.onerror = () => {
-          toast.error('Failed to load payment provider');
-          reject(new Error('Failed to load Paystack script'));
-        };
-        
-        document.body.appendChild(script);
+        } else {
+          // Add the script dynamically
+          const script = document.createElement('script');
+          script.id = 'paystack-script';
+          script.src = 'https://js.paystack.co/v1/inline.js';
+          script.async = true;
+          
+          script.onload = () => {
+            setTimeout(() => initializePaystackPayment(amount, email, resolve, reject), 500);
+          };
+          
+          script.onerror = () => {
+            toast.error('Failed to load payment provider');
+            reject(new Error('Failed to load Paystack script'));
+          };
+          
+          document.body.appendChild(script);
+        }
       } catch (error) {
         console.error('Error in fundWalletWithPaystack:', error);
         toast.error('Payment initialization failed');
@@ -380,3 +343,40 @@ export const fundWalletWithPaystack = (amount: number, email: string): Promise<b
     }
   });
 };
+
+function initializePaystackPayment(amount: number, email: string, resolve: (value: boolean) => void, reject: (reason?: any) => void) {
+  try {
+    if (!window.PaystackPop) {
+      toast.error("Payment provider failed to load");
+      reject(new Error("PaystackPop not available"));
+      return;
+    }
+    
+    const handler = window.PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: amount * 100, // Paystack uses amount in kobo (multiply by 100)
+      currency: 'NGN',
+      ref: `HOVAPAY_PS_${Date.now()}`,
+      callback: function(response: any) {
+        console.log('Paystack response:', response);
+        if (response.status === 'success') {
+          toast.success('Payment successful!');
+          resolve(true);
+        } else {
+          toast.error('Payment failed');
+          resolve(false);
+        }
+      },
+      onClose: function() {
+        toast.info('Payment window closed');
+        resolve(false);
+      }
+    });
+    handler.openIframe();
+  } catch (error) {
+    console.error('Error initializing Paystack:', error);
+    toast.error('Failed to initialize payment');
+    reject(error);
+  }
+}

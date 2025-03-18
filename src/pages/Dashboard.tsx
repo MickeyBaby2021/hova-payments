@@ -14,11 +14,14 @@ import {
   Receipt,
   Clock,
   Wallet,
-  Smartphone
+  Smartphone,
+  Eye,
+  EyeOff,
+  LogOut
 } from "lucide-react";
 
 const Dashboard = () => {
-  const { user, transactions } = useUser();
+  const { user, transactions, showBalance, toggleBalanceVisibility, logout } = useUser();
   const navigate = useNavigate();
   
   // Get real transactions
@@ -31,15 +34,31 @@ const Dashboard = () => {
     { icon: PlusCircle, name: "More", color: "bg-gradient-to-br from-indigo-600 to-blue-800", route: "/more" },
   ];
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-6 fade-in max-w-md mx-auto">
         {/* Title with elegant styling */}
-        <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-700 to-blue-800 bg-clip-text text-transparent mb-1 tracking-tight">
-            HOVAPAY
-          </h1>
-          <p className="text-sm text-muted-foreground">Your Financial Partner</p>
+        <div className="mb-6 flex justify-between items-center">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-indigo-700 to-blue-800 bg-clip-text text-transparent mb-1 tracking-tight">
+              HOVAPAY
+            </h1>
+            <p className="text-sm text-muted-foreground">Your Financial Partner</p>
+          </div>
+          <Button 
+            variant="outline"
+            size="sm"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200 dark:border-red-800"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
         
         {/* Main Wallet Card */}
@@ -49,10 +68,22 @@ const Dashboard = () => {
               <Wallet className="h-5 w-5" />
               <p className="text-sm font-medium">Main Wallet</p>
             </div>
-            <span className="text-sm opacity-60">Available Balance</span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10"
+              onClick={toggleBalanceVisibility}
+            >
+              {showBalance ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </Button>
           </div>
           <div className="my-4">
-            <h1 className="text-4xl font-bold">₦{user?.balance.toLocaleString()}</h1>
+            <h1 className="text-4xl font-bold">
+              {showBalance 
+                ? `₦${user?.balance.toLocaleString()}`
+                : "₦•••••••"
+              }
+            </h1>
           </div>
           <div className="flex justify-between items-center">
             <Button 
