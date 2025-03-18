@@ -5,4 +5,9 @@ interface Window {
     initialize: (config: any) => void;
     openIframe: () => void;
   };
+  PaystackPop?: {
+    setup: (config: any) => {
+      openIframe: () => void;
+    };
+  };
 }

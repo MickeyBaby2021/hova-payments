@@ -329,6 +329,12 @@ export const fundWalletWithPaystack = (amount: number, email: string): Promise<b
         
         script.onload = () => {
           try {
+            if (!window.PaystackPop) {
+              toast.error("Payment provider failed to load");
+              reject(new Error("PaystackPop not available"));
+              return;
+            }
+            
             const handler = window.PaystackPop.setup({
               key: PAYSTACK_PUBLIC_KEY,
               email: email,
