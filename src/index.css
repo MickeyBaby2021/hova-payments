@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -86,6 +87,10 @@
   @apply bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-2xl shadow-md;
 }
 
+.blue-gradient-card {
+  @apply bg-gradient-to-br from-blue-700 to-indigo-900 text-white rounded-2xl shadow-md;
+}
+
 .pink-card {
   @apply bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 text-white rounded-2xl shadow-md;
 }
@@ -96,7 +101,7 @@
 }
 
 .ios-primary-card {
-  @apply bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-2xl shadow-md;
+  @apply bg-gradient-to-br from-blue-700 to-indigo-800 text-white rounded-2xl shadow-md;
 }
 
 .ios-secondary-card {
@@ -172,13 +177,22 @@
   @apply bg-blue-50 dark:bg-blue-900/20;
 }
 
+/* Text gradients */
+.text-gradient-blue {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-800;
+}
+
+.text-gradient-purple {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600;
+}
+
 /* Chat Widget Styles */
 .chat-widget {
   @apply fixed bottom-20 right-4 z-50 w-72 md:w-80 shadow-xl rounded-xl overflow-hidden transition-all duration-300 ease-in-out bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800;
 }
 
 .chat-widget-header {
-  @apply bg-primary p-3 text-white font-medium flex items-center justify-between;
+  @apply bg-gradient-to-r from-blue-700 to-indigo-800 p-3 text-white font-medium flex items-center justify-between;
 }
 
 .chat-widget-content {
@@ -194,7 +208,7 @@
 }
 
 .chat-bubble-user {
-  @apply bg-primary text-white ml-auto rounded-br-none;
+  @apply bg-blue-600 text-white ml-auto rounded-br-none;
 }
 
 .chat-bubble-agent {
@@ -248,8 +262,8 @@
 
 /* iOS-style buttons */
 .ios-button {
-  @apply rounded-full bg-primary text-white py-3 px-6 font-medium text-sm transition-all 
-         hover:bg-hover active:transform active:scale-95 shadow-sm;
+  @apply rounded-full bg-blue-700 text-white py-3 px-6 font-medium text-sm transition-all 
+         hover:bg-blue-800 active:transform active:scale-95 shadow-sm;
 }
 
 .ios-button-secondary {
@@ -258,5 +272,14 @@
 }
 
 .ios-input {
-  @apply bg-gray-100 dark:bg-gray-800 border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-primary transition-all;
+  @apply bg-gray-100 dark:bg-gray-800 border-0 rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-700 transition-all;
+}
+
+/* Added classes for button gradients */
+.btn-gradient-blue {
+  @apply bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900 text-white;
+}
+
+.btn-gradient-purple {
+  @apply bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white;
 }

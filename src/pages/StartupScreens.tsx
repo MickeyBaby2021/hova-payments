@@ -1,125 +1,96 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { WalletIcon, Zap, CreditCard, ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight, ShieldCheck, CreditCard, Smartphone } from "lucide-react";
 
 const StartupScreens = () => {
   const [currentScreen, setCurrentScreen] = useState(0);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Auto-advance screens after delay
-    const timer = setTimeout(() => {
-      if (currentScreen < screens.length - 1) {
-        setCurrentScreen(prev => prev + 1);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [currentScreen]);
-
+  
   const screens = [
     {
-      title: "Welcome to HovaPay",
-      description: "Your one-stop solution for all bill payments and financial services.",
-      icon: <ShieldCheck className="h-16 w-16 text-primary" />,
-      color: "bg-primary/10",
+      title: "Welcome to HOVAPAY",
+      description: "Your ultimate financial companion for all your payment needs",
+      icon: <CreditCard className="h-16 w-16 text-blue-300" />,
     },
     {
-      title: "Pay bills effortlessly",
-      description: "Fast and secure payments for airtime, data, electricity, TV subscriptions and more.",
-      icon: <Zap className="h-16 w-16 text-primary" />,
-      color: "bg-primary/10",
+      title: "Secure Transactions",
+      description: "We use industry-leading security measures to protect your financial data",
+      icon: <ShieldCheck className="h-16 w-16 text-blue-300" />,
     },
     {
-      title: "Secure wallet system",
-      description: "Fund your wallet once and make multiple payments without stress.",
-      icon: <WalletIcon className="h-16 w-16 text-indigo-600" />,
-      color: "bg-indigo-100 dark:bg-indigo-950/30",
+      title: "Pay On The Go",
+      description: "Make payments, buy airtime, and pay bills anytime, anywhere",
+      icon: <Smartphone className="h-16 w-16 text-blue-300" />,
     },
-    {
-      title: "Multiple payment options",
-      description: "Pay with cards, bank transfers, or mobile money. It's your choice.",
-      icon: <CreditCard className="h-16 w-16 text-green-600" />,
-      color: "bg-green-100 dark:bg-green-950/30",
-    }
   ];
-
-  const handleGetStarted = () => {
-    navigate("/login");
-  };
-
-  const handleSkip = () => {
-    navigate("/login");
-  };
-
-  const goToNextScreen = () => {
+  
+  const handleNext = () => {
     if (currentScreen < screens.length - 1) {
       setCurrentScreen(prev => prev + 1);
     } else {
-      handleGetStarted();
+      navigate("/login");
     }
   };
-
+  
+  const handleSkip = () => {
+    navigate("/login");
+  };
+  
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-900 via-indigo-800 to-blue-800 opacity-100" />
+      
+      <div className="flex-1 flex flex-col items-center justify-center p-6 z-10">
+        <div className="w-full max-w-md mx-auto">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl font-bold text-white mb-2 drop-shadow-lg">HOVAPAY</h1>
+            <p className="text-blue-200 text-lg">Your Financial Partner</p>
+          </div>
+          
+          <div className="py-8 flex flex-col items-center">
+            <div className="bg-white/10 rounded-full p-10 backdrop-blur-md shadow-xl mb-8">
+              {screens[currentScreen].icon}
+            </div>
+            
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">
+              {screens[currentScreen].title}
+            </h2>
+            <p className="text-blue-100 text-center mb-8 max-w-xs">
+              {screens[currentScreen].description}
+            </p>
+            
+            <div className="flex justify-center space-x-2 mb-8">
+              {screens.map((_, index) => (
+                <div
+                  key={index}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentScreen ? "w-8 bg-blue-400" : "w-2 bg-blue-400/30"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="p-6 flex justify-between items-center z-10">
         <Button 
-          variant="ghost" 
-          className="text-sm glass-card"
+          variant="ghost"
+          className="text-blue-200 hover:text-white"
           onClick={handleSkip}
         >
           Skip
         </Button>
-      </div>
-      
-      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-8">
-        <Card className={`p-8 w-full max-w-md mx-auto glass-card ${screens[currentScreen].color} border-none shadow-lg`}>
-          <div className="flex justify-center mb-6">
-            {screens[currentScreen].icon}
-          </div>
-          <h1 className="text-3xl font-bold text-center mb-4">
-            {screens[currentScreen].title}
-          </h1>
-          <p className="text-muted-foreground text-center text-lg mb-8">
-            {screens[currentScreen].description}
-          </p>
-        </Card>
-
-        <div className="flex justify-center space-x-2 mt-6">
-          {screens.map((_, index) => (
-            <div 
-              key={index}
-              className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${
-                currentScreen === index ? "w-8 bg-primary" : "w-2 bg-muted"
-              }`}
-              onClick={() => setCurrentScreen(index)}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="p-6">
-        {currentScreen < screens.length - 1 ? (
-          <Button 
-            className="w-full flex items-center justify-center glass-card" 
-            size="lg"
-            onClick={goToNextScreen}
-          >
-            Continue
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        ) : (
-          <Button 
-            className="w-full glass-card" 
-            size="lg"
-            onClick={handleGetStarted}
-          >
-            Get Started
-          </Button>
-        )}
+        <Button 
+          className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 border-0"
+          onClick={handleNext}
+        >
+          {currentScreen < screens.length - 1 ? "Next" : "Get Started"}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
-import { initiateFlutterwavePayment, initiateMonnifyPayment } from "@/services/payment";
+import { initiatePaystackPayment, initiateMonnifyPayment } from "@/services/payment";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +25,7 @@ const Wallet = () => {
   const navigate = useNavigate();
   const { user, addToBalance, transactions } = useUser();
   const [amount, setAmount] = useState<string>("");
-  const [paymentMethod, setPaymentMethod] = useState<string>("flutterwave");
+  const [paymentMethod, setPaymentMethod] = useState<string>("paystack");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showNumpad, setShowNumpad] = useState<boolean>(false);
   const [showDialog, setShowDialog] = useState<boolean>(false);
@@ -51,9 +52,9 @@ const Wallet = () => {
     try {
       let result: number | null = null;
       
-      if (paymentMethod === "flutterwave") {
-        toast.info("Initializing Flutterwave payment...");
-        result = await initiateFlutterwavePayment({
+      if (paymentMethod === "paystack") {
+        toast.info("Initializing Paystack payment...");
+        result = await initiatePaystackPayment({
           email: user?.email || "user@example.com",
           amount: amountValue,
           name: user?.name || "User",
@@ -105,7 +106,7 @@ const Wallet = () => {
 
   const handleQuickFund = (amt: number) => {
     setAmount(amt.toString());
-    setPaymentMethod("flutterwave");
+    setPaymentMethod("paystack");
     setShowNumpad(true);
     setShowDialog(true);
   };
@@ -119,14 +120,14 @@ const Wallet = () => {
     <DashboardLayout>
       <div className="space-y-6 fade-in max-w-md mx-auto">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Wallet</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-indigo-900 bg-clip-text text-transparent">Wallet</h1>
           <Dialog open={showDialog} onOpenChange={setShowDialog}>
             <DialogTrigger asChild>
               <Button className="bg-primary hover:bg-hover rounded-full">Fund Wallet</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-xl">
               <DialogHeader>
-                <DialogTitle className="text-xl font-bold text-center bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Fund Wallet</DialogTitle>
+                <DialogTitle className="text-xl font-bold text-center bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">Fund Wallet</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 {paymentError && (
@@ -149,7 +150,7 @@ const Wallet = () => {
                       </Button>
                       <div className="text-center">
                         <p className="text-sm text-muted-foreground">Enter Amount</p>
-                        <div className="text-3xl font-bold my-2 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                        <div className="text-3xl font-bold my-2 bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">
                           ₦{amount || "0"}
                         </div>
                       </div>
@@ -186,7 +187,7 @@ const Wallet = () => {
                     </div>
                     
                     <Button 
-                      className="w-full h-14 text-lg rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700" 
+                      className="w-full h-14 text-lg rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" 
                       onClick={handlePayment}
                       disabled={isLoading || !amount || parseFloat(amount) <= 0}
                     >
@@ -198,7 +199,7 @@ const Wallet = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 rounded-xl text-center text-white">
+                    <div className="bg-gradient-to-r from-blue-700 to-indigo-800 p-4 rounded-xl text-center text-white">
                       <p className="text-sm text-white/80">Available Balance</p>
                       <p className="text-3xl font-bold">₦{user?.balance.toLocaleString()}</p>
                     </div>
@@ -209,13 +210,13 @@ const Wallet = () => {
                       className="space-y-3"
                     >
                       <div className="border rounded-xl p-4 flex items-center space-x-3 hover:border-primary transition-colors">
-                        <RadioGroupItem value="flutterwave" id="flutterwave" />
-                        <Label htmlFor="flutterwave" className="flex items-center space-x-3 cursor-pointer flex-1">
-                          <div className="bg-orange-100 dark:bg-orange-900/30 p-2 rounded-full">
-                            <CreditCard className="h-5 w-5 text-orange-600" />
+                        <RadioGroupItem value="paystack" id="paystack" />
+                        <Label htmlFor="paystack" className="flex items-center space-x-3 cursor-pointer flex-1">
+                          <div className="bg-green-100 dark:bg-green-900/30 p-2 rounded-full">
+                            <CreditCard className="h-5 w-5 text-green-600" />
                           </div>
                           <div>
-                            <p className="font-medium">Flutterwave</p>
+                            <p className="font-medium">Paystack</p>
                             <p className="text-xs text-muted-foreground">Pay with card, bank transfer or USSD</p>
                           </div>
                         </Label>
@@ -236,7 +237,7 @@ const Wallet = () => {
                     </RadioGroup>
                     
                     <div className="flex justify-center">
-                      <Button size="lg" className="w-full rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700" onClick={() => setShowNumpad(true)}>
+                      <Button size="lg" className="w-full rounded-full bg-gradient-to-r from-blue-700 to-indigo-800 hover:from-blue-800 hover:to-indigo-900" onClick={() => setShowNumpad(true)}>
                         Continue
                       </Button>
                     </div>
@@ -248,7 +249,7 @@ const Wallet = () => {
         </div>
 
         {/* Balance Card */}
-        <Card className="ios-primary-card p-6">
+        <Card className="bg-gradient-to-r from-blue-700 to-indigo-800 p-6 text-white rounded-2xl shadow-xl">
           <div className="flex items-center space-x-4 mb-4">
             <WalletIcon className="h-8 w-8" />
             <div>
@@ -261,7 +262,7 @@ const Wallet = () => {
         {/* Quick Fund Options */}
         <div className="grid gap-4">
           <Card className="p-5 hover-effect ios-card">
-            <h2 className="text-xl font-semibold mb-1 bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Quick Fund</h2>
+            <h2 className="text-xl font-semibold mb-1 bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">Quick Fund</h2>
             <p className="text-sm text-muted-foreground mb-4">
               Add money to your wallet quickly
             </p>
@@ -272,7 +273,7 @@ const Wallet = () => {
                   variant="outline" 
                   onClick={() => {
                     setAmount(amt.toString());
-                    setPaymentMethod("flutterwave");
+                    setPaymentMethod("paystack");
                     setShowNumpad(true);
                     setShowDialog(true);
                   }}
@@ -288,7 +289,7 @@ const Wallet = () => {
           {/* Recent Transactions */}
           <Card className="p-5 ios-card">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Recent Funding</h2>
+              <h2 className="text-lg font-medium bg-gradient-to-r from-blue-700 to-indigo-800 bg-clip-text text-transparent">Recent Funding</h2>
               <Button
                 variant="ghost"
                 size="sm"

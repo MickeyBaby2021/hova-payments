@@ -2,27 +2,31 @@
 import { toast } from "sonner";
 
 // Live API keys for production use
-const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-5d9b05395a71e81a89a7cea86a40455d-X"; // Live key for production
-const MONNIFY_API_KEY = "MK_PROD_4JQ22NQB3M"; // Live key for production
+const MONNIFY_API_KEY = "MK_PROD_YC67K7T2R3";
+const MONNIFY_SECRET_KEY = "GCGJDSYTMW30ELELCPEUUZLLTYMT8QAZ";
 const MONNIFY_CONTRACT_CODE = "4934121693";
-const VTPASS_API_KEY = "81bd4314130d487a9acef9638b5c4ae9";
-const VTPASS_SECRET_KEY = "SK_90b3d84f4b52e0b8ac93f3b654c62a97c06c8420786";
-const VTPASS_PUBLIC_KEY = "PK_4acee3030889d4292d173bc642603bfe6c02b988be0";
+
+const PAYSTACK_PUBLIC_KEY = "pk_live_fb6223108ec36214d45f11b2dc7e1fc483cb6014";
+const PAYSTACK_SECRET_KEY = "sk_live_369866fc9f00f9df3b31f31bf9c7f8b518ac0779";
+
+const VTPASS_PUBLIC_KEY = "PK_11668ef461c7ceb02a36b82b625db967c359a025d6c";
+const VTPASS_SECRET_KEY = "SK_123e0d7e681a947ea1f9af3c5723ef55df3ec67d18e";
 
 // VTPass API endpoints
-const VTPASS_BASE_URL = "https://vtpass.com/api"; // Live API endpoint (not sandbox)
+const VTPASS_BASE_URL = "https://vtpass.com/api"; // Live API endpoint
 
 // Customer Verification for services
 export const verifyCustomer = async (serviceID: string, billersCode: string, type: string = "prepaid") => {
   try {
     console.log(`Verifying customer: ${billersCode} for service: ${serviceID}, type: ${type}`);
     
-    // When connected to backend, this would call the VTPass API
+    // This would call the VTPass API in a real implementation
+    // Using the live keys now
     // const response = await fetch(`${VTPASS_BASE_URL}/merchant-verify`, {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json',
-    //     'api-key': VTPASS_API_KEY,
+    //     'api-key': VTPASS_PUBLIC_KEY,
     //     'secret-key': VTPASS_SECRET_KEY
     //   },
     //   body: JSON.stringify({
@@ -115,11 +119,12 @@ export const payBill = async (payload: any) => {
     console.log("Processing bill payment:", payload);
     
     // When connected to backend, this would call the VTPass API
+    // Using the live keys now
     // const response = await fetch(`${VTPASS_BASE_URL}/pay`, {
     //   method: 'POST',
     //   headers: {
     //     'Content-Type': 'application/json',
-    //     'api-key': VTPASS_API_KEY,
+    //     'api-key': VTPASS_PUBLIC_KEY,
     //     'secret-key': VTPASS_SECRET_KEY
     //   },
     //   body: JSON.stringify({
@@ -141,22 +146,22 @@ export const payBill = async (payload: any) => {
 };
 
 // Payment handling functions for wallet funding
-export const initiateFlutterwavePayment = async (paymentDetails: {
+export const initiatePaystackPayment = async (paymentDetails: {
   email: string;
   amount: number;
   name: string;
   phone: string;
 }): Promise<number | null> => {
   try {
-    console.log("Initiating Flutterwave payment:", paymentDetails);
-    const result = await fundWalletWithFlutterwave(paymentDetails.amount, paymentDetails.email);
+    console.log("Initiating Paystack payment:", paymentDetails);
+    const result = await fundWalletWithPaystack(paymentDetails.amount, paymentDetails.email);
     
     if (result) {
       return paymentDetails.amount;
     }
     return null;
   } catch (error) {
-    console.error("Error initiating Flutterwave payment:", error);
+    console.error("Error initiating Paystack payment:", error);
     throw error;
   }
 };
@@ -219,7 +224,7 @@ export const fundWalletWithMonnify = (amount: number, email: string): Promise<bo
                         apiKey: MONNIFY_API_KEY,
                         contractCode: MONNIFY_CONTRACT_CODE,
                         paymentDescription: "Wallet Funding",
-                        isTestMode: true,
+                        isTestMode: false, // Changed to false for live mode
                         onComplete: (response: any) => {
                           // Handle successful payment
                           if (response.status === "SUCCESS") {
@@ -286,7 +291,7 @@ export const fundWalletWithMonnify = (amount: number, email: string): Promise<bo
             apiKey: MONNIFY_API_KEY,
             contractCode: MONNIFY_CONTRACT_CODE,
             paymentDescription: "Wallet Funding",
-            isTestMode: true,
+            isTestMode: false, // Changed to false for live mode
             onComplete: (response: any) => {
               if (response.status === "SUCCESS") {
                 toast.success("Wallet funded successfully!");
@@ -313,93 +318,59 @@ export const fundWalletWithMonnify = (amount: number, email: string): Promise<bo
   });
 };
 
-export const fundWalletWithFlutterwave = (amount: number, email: string): Promise<boolean> => {
+export const fundWalletWithPaystack = (amount: number, email: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     if (typeof window !== "undefined") {
       try {
-        // Clear any existing Flutterwave scripts to avoid conflicts
-        const existingScript = document.getElementById('flutterwave-script');
-        if (existingScript) {
-          document.body.removeChild(existingScript);
-        }
-        
         // Add the script dynamically
         const script = document.createElement('script');
-        script.id = 'flutterwave-script';
-        script.src = 'https://checkout.flutterwave.com/v3.js';
+        script.src = 'https://js.paystack.co/v1/inline.js';
         script.async = true;
-        document.body.appendChild(script);
         
         script.onload = () => {
-          setTimeout(() => {
-            try {
-              processFlutterwavePayment(amount, email, resolve, reject);
-            } catch (error) {
-              console.error("Error initializing Flutterwave:", error);
-              toast.error("Failed to initialize payment");
-              reject(error);
-            }
-          }, 1000);
+          try {
+            const handler = window.PaystackPop.setup({
+              key: PAYSTACK_PUBLIC_KEY,
+              email: email,
+              amount: amount * 100, // Paystack uses amount in kobo (multiply by 100)
+              currency: 'NGN',
+              ref: `HOVAPAY_PS_${Date.now()}`,
+              callback: function(response: any) {
+                console.log('Paystack response:', response);
+                if (response.status === 'success') {
+                  toast.success('Payment successful!');
+                  resolve(true);
+                } else {
+                  toast.error('Payment failed');
+                  resolve(false);
+                }
+              },
+              onClose: function() {
+                toast.info('Payment window closed');
+                resolve(false);
+              }
+            });
+            handler.openIframe();
+          } catch (error) {
+            console.error('Error initializing Paystack:', error);
+            toast.error('Failed to initialize payment');
+            reject(error);
+          }
         };
         
         script.onerror = () => {
-          toast.error("Failed to load payment provider");
-          reject(new Error("Failed to load script"));
+          toast.error('Failed to load payment provider');
+          reject(new Error('Failed to load Paystack script'));
         };
+        
+        document.body.appendChild(script);
       } catch (error) {
-        console.error("Error in fundWalletWithFlutterwave:", error);
-        toast.error("Payment initialization failed");
+        console.error('Error in fundWalletWithPaystack:', error);
+        toast.error('Payment initialization failed');
         reject(error);
       }
     } else {
-      reject(new Error("Window is not defined"));
+      reject(new Error('Window is not defined'));
     }
   });
-};
-
-const processFlutterwavePayment = (
-  amount: number,
-  email: string,
-  resolve: (value: boolean) => void,
-  reject: (reason: any) => void
-) => {
-  try {
-    const txRef = `HOVAPAY_FLW_${Date.now()}`;
-    
-    window.FlutterwaveCheckout({
-      public_key: FLUTTERWAVE_PUBLIC_KEY,
-      tx_ref: txRef,
-      amount,
-      currency: "NGN",
-      payment_options: "card, banktransfer, ussd",
-      customer: {
-        email,
-        name: "HovaPay User",
-        phone_number: "07044040403" // Default phone number
-      },
-      customizations: {
-        title: "HovaPay Wallet Funding",
-        description: "Fund your HovaPay wallet",
-        logo: "https://cdn.pixabay.com/photo/2021/09/06/01/13/wallet-6600696_1280.png",
-      },
-      callback: (response: any) => {
-        console.log("Payment response:", response);
-        if (response.status === "successful") {
-          toast.success("Wallet funded successfully!");
-          resolve(true);
-        } else {
-          toast.error("Payment was not successful");
-          resolve(false);
-        }
-      },
-      onclose: () => {
-        toast.info("Payment window closed");
-        resolve(false);
-      },
-    });
-  } catch (error) {
-    console.error("Error processing Flutterwave payment:", error);
-    toast.error("Payment initialization failed");
-    reject(error);
-  }
 };
